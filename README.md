@@ -7,8 +7,8 @@ activity diagram URL: https://drive.google.com/file/d/1jN1hSeiGfo506q6LY8Hsu6xdz
 sequence diagram URL: https://drive.google.com/file/d/1edW8Q-rN9KWwt_aw7InlLQ20LjKA2T0q/view?usp=sharing  
 state diagram URL: https://drive.google.com/file/d/1DdAmtjhJVTZxuumKCJBitexs_P8zL3vg/view?usp=sharing
 ****
-模型:waterfall model
-前端:react
-後端:
-資料庫:MySQL
+模型:waterfall model  
+前端:react  
+後端:  
+資料庫:MySQL  
 
