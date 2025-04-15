@@ -11,6 +11,6 @@ state diagram URL: https://drive.google.com/file/d/1DdAmtjhJVTZxuumKCJBitexs_P8z
 ****
 模型:waterfall model  
 前端:react  
-後端:  
+後端:Flask
 資料庫:MySQL  
 
