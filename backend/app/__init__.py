@@ -13,5 +13,8 @@ def create_app():
     # Register blueprint
     from app.views.sample import sample_bp
     app.register_blueprint(sample_bp)
+    from app.views.auth import auth_bp
+    app.register_blueprint(auth_bp)
+
 
     return app
