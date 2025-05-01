@@ -13,6 +13,6 @@ state diagram URL: https://drive.google.com/file/d/1DdAmtjhJVTZxuumKCJBitexs_P8z
 前端:react  
 後端:Flask  
 資料庫:MySQL  
-ORM:Sequelize 
-API:RESTful API
-開發框架:MVC 架構
+ORM:Sequelize  
+API:RESTful API  
+開發框架:MVC 架構  
