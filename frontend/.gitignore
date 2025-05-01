@@ -1,3 +1,6 @@
+# ===================
+# Frontend: Node.js
+# ===================
 # Logs
 logs
 *.log
@@ -7,15 +10,37 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+# Dependency directories
+node_modules/
+dist/
+dist-ssr/
+
+# Vite/React
 *.local
 
-# Editor directories and files
-.vscode/*
+# ===================
+# Backend: Python
+# ===================
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environment
+venv/
+
+# Python env/IDE
+.env
+*.env
+*.db
+*.sqlite3
+
+# ===================
+# Editor config
+# ===================
+.vscode/
 !.vscode/extensions.json
-.idea
+.idea/
 .DS_Store
 *.suo
 *.ntvs*
