@@ -47,5 +47,3 @@ venv/
 *.njsproj
 *.sln
 *.sw?
-Frontend/package-lock.json
-Frontend/package.json
