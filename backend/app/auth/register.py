@@ -15,6 +15,7 @@ def register():
     email        = data.get('email', '').strip()
     school_name  = data.get('school_name', '').strip()
     password     = data.get('password', '')
+    role         = data.get('role', 'student')  # 預設為學生
 
     # 2. 基本欄位檢查
     if not all([first_name, last_name, user_id, username, email, school_name, password]):
@@ -39,11 +40,11 @@ def register():
         # 5. 插入新使用者
         ins_sql = """
         INSERT INTO users 
-            (first_name, last_name, user_id, username, email, school_name, password_hash)
-        VALUES (%s, %s, %s, %s, %s, %s, %s)
+            (first_name, last_name, role , user_id, username, email, school_name, password_hash)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         """
         cursor.execute(ins_sql, (
-            first_name, last_name, user_id,
+            first_name, last_name, role ,user_id,
             username, email, school_name,
             pwd_hash
         ))
