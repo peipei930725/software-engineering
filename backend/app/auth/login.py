@@ -1,12 +1,13 @@
 # app/auth.py
 from flask import Blueprint, request, jsonify, current_app
 from werkzeug.security import check_password_hash
-from .. import mysql
+from .. import db
 
 auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/api/login', methods=['POST'])
 def login():
+
     # 1. 解析 JSON
     data = request.get_json(force=True)
     username = data.get('username')
@@ -18,7 +19,7 @@ def login():
 
     # 3. 從資料庫查詢密碼雜湊
     try:
-        cur = mysql.connection.cursor()
+        cur = db.connection.cursor()
         cur.execute(
             "SELECT password_hash FROM users WHERE username = %s",
             (username,)

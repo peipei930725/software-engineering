@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, current_app
 from werkzeug.security import generate_password_hash
-from .. import mysql
+from .. import db
 
 register_bp = Blueprint('register', __name__)
 
@@ -21,7 +21,7 @@ def register():
     if not all([first_name, last_name, user_id, username, email, school_name, password]):
         return jsonify({"error": "請完整填寫所有欄位（含密碼）"}), 400
 
-    conn = mysql.connect()
+    conn = db.connect()
     cursor = conn.cursor()
     try:
         # 3. 唯一性檢查：user_id / username / email

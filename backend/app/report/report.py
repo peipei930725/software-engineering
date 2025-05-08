@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, current_app
 from werkzeug.security import generate_password_hash
-from .. import mysql
+from .. import db
 
 report_bp = Blueprint('report', __name__)
 

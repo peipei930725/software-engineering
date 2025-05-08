@@ -13,19 +13,19 @@ def create_app():
     # Register blueprint
 
     # sample
-    from backend.app.sample.sample import sample_bp
+    from .sample.sample import sample_bp
     app.register_blueprint(sample_bp)
-    from backend.app.sample.echo import echo_bp
+    from .sample.echo import echo_bp
     app.register_blueprint(echo_bp)
 
     # auth
-    from backend.app.auth.login import auth_bp
+    from .auth.login import auth_bp
     app.register_blueprint(auth_bp)
-    from backend.app.auth.register import register_bp
+    from .auth.register import register_bp
     app.register_blueprint(register_bp)
 
     # report
-    from backend.app.report.report import report_bp
+    from .report.report import report_bp
     app.register_blueprint(report_bp)
 
     return app
