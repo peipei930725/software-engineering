@@ -15,6 +15,8 @@ def create_app():
     app.register_blueprint(sample_bp)
     from app.views.auth import auth_bp
     app.register_blueprint(auth_bp)
+    from app.views.echo import echo_bp
+    app.register_blueprint(echo_bp)
 
 
     return app
