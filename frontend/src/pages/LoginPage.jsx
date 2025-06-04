@@ -3,18 +3,18 @@ import { Link } from "react-router-dom";
 function LoginPage() {
 	return (
 		<>
-			<div className="bg-[#023047] text-white h-screen w-screen flex flex-col items-center justify-center">
+			<div className="bg-[#023047] text-white min-h-screen w-screen flex flex-col items-center justify-center">
 				<div className="bg-white text-black rounded-lg p-12 w-110 shadow-lg">
 					<h2 className="text-2xl font-semibold mb-6 text-center">
 						登入
 					</h2>
 					<form className="space-y-4">
 						<div>
-							<label className="block mb-1">電子郵件</label>
+							<label className="block mb-1">身分證字號</label>
 							<input
-								type="email"
+								type="text"
 								className="w-full px-3 py-2 border border-gray-300 rounded"
-								placeholder="請輸入電子郵件"
+								placeholder="請輸入身分證字號"
 							/>
 						</div>
 						<div>
