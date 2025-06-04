@@ -1,53 +1,138 @@
-import React from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { React, useState } from "react";
+import { Link } from "react-router-dom";
 
 function RegisterPage() {
-	const navigate = useNavigate();
-
+	const [selectedRole, setSelectedRole] = useState(null);
 	const handleRoleSelect = (role) => {
-		switch (role) {
-			case "student":
-				navigate("/register/student");
-				break;
-			case "teacher":
-				navigate("/register/teacher");
-				break;
-			case "judge":
-				navigate("/register/judge");
-				break;
-			default:
-				break;
-		}
+		setSelectedRole(role);
+	};
+
+	const renderForm = () => {
+		return (
+			<form className="text-black">
+				<InputColumn
+					columnName="姓名"
+					placeHolder="請輸入姓名，例：王小明"
+				/>
+				<InputColumn
+					columnName="E-mail（電子郵件）"
+					placeHolder="請輸入E-mail，例：example@gmail.com"
+				/>
+				<InputColumn columnName="密碼" placeHolder="請輸入密碼" />
+				<InputColumn
+					columnName="手機號碼"
+					placeHolder="請輸入手機號碼，例：0912345678"
+				/>
+				<InputColumn
+					columnName="聯絡地址"
+					placeHolder="請輸入聯絡地址，例：高雄市楠梓區高雄大學路700號"
+				/>
+				<InputColumn
+					columnName="身分證字號（帳號）"
+					placeHolder="請輸入身分證字號，例：A123456789"
+				/>
+				{selectedRole === "judge" && (
+					<InputColumn
+						columnName="頭銜"
+						placeHolder="請輸入您的頭銜，例：國立高雄大學校長"
+					/>
+				)}
+				{selectedRole === "teacher" && (
+					<InputColumn
+						columnName="最高學歷"
+						placeHolder="例：國立高雄大學電機工程學系博士"
+					/>
+				)}
+				{selectedRole === "student" && (
+					<>
+						<InputColumn
+							columnName={"系所"}
+							placeHolder="請輸入系所，例：國立高雄大學資訊工程學系"
+						/>
+						<div>
+							<label className="">年級</label><br/>
+							<select name="grade" id="" className="w-full px-3 py-2 border border-gray-300 rounded mb-4 mt-1">
+								<option value="" disabled selected>請選擇年級</option>
+								<option value="1">1</option>
+								<option value="2">2</option>
+								<option value="3">3</option>
+								<option value="4">4</option>
+							</select>
+						</div>
+						<InputColumn
+							columnName={"學號"}
+							placeHolder="請輸入學號，例：A1115500"
+						/>
+					</>
+				)}
+			</form>
+		);
 	};
 
 	return (
 		<>
-			<div className="bg-[#023047] h-screen w-screen m-0 flex flex-col items-center justify-center inset-0 overflow-y-auto">
-				<div className="relative bg-white/90 backdrop-blur-xl shadow-2xl border border-white/30 rounded-3xl p-10 md:p-12 max-w-4xl w-full text-center">
-					<h2 className="text-2xl font-bold mb-10 text-black">
-						選擇您的身分類別
-					</h2>
-					<div className="flex flex-col items-center pb-12 px-4">
-						<div className="flex flex-wrap justify-center gap-10 w-full">
-							<Card
-								onClick={() => handleRoleSelect("student")}
-								img="/student.png"
-								label="學生"
-							/>
-							<Card
-								onClick={() => handleRoleSelect("teacher")}
-								img="/teacher.jpg"
-								label="指導老師"
-							/>
-							<Card
-								onClick={() => handleRoleSelect("judge")}
-								img="/judge.png"
-								label="評審"
-							/>
+			<div className="bg-[#023047] min-h-screen w-screen m-0 flex flex-col items-center justify-center inset-0 overflow-y-auto pb-4 pt-10">
+				{!selectedRole ? (
+					<>
+						<div className="relative bg-white/90 backdrop-blur-xl shadow-2xl border border-white/30 rounded-3xl p-10 md:p-12 max-w-4xl w-full text-center">
+							<h2 className="text-2xl font-bold mb-10 text-black">
+								選擇您的身分類別
+							</h2>
+							<div className="flex flex-col items-center pb-12 px-4">
+								<div className="flex flex-wrap justify-center gap-10 w-full">
+									<Card
+										onClick={() =>
+											handleRoleSelect("student")
+										}
+										img="/student.png"
+										label="學生"
+									/>
+									<Card
+										onClick={() =>
+											handleRoleSelect("teacher")
+										}
+										img="/teacher.jpg"
+										label="指導老師"
+									/>
+									<Card
+										onClick={() =>
+											handleRoleSelect("judge")
+										}
+										img="/judge.png"
+										label="評審"
+									/>
+								</div>
+							</div>
 						</div>
-					</div>
-				</div>
-                <div>
+					</>
+				) : (
+					<>
+						<div className="bg-white text-black rounded-lg p-12 w-120 shadow-lg">
+							<h2 className="text-2xl font-bold mb-4 text-black text-center">
+								{selectedRole === "student"
+									? "學生註冊"
+									: selectedRole === "teacher"
+									? "指導老師註冊"
+									: "評審註冊"}
+							</h2>
+
+							{renderForm()}
+							<button
+								className="mt-6 text-sm text-white hover:underline"
+								onClick={() => setSelectedRole(null)}
+							>
+								← 返回身分選擇
+							</button>
+							<button
+								className="!bg-green-500 mt-6 text-sm text-white hover:underline float-right px-6 py-2 rounded-md hover:!bg-green-600"
+								onClick={() => setSelectedRole(null)}
+							>
+								確認註冊
+							</button>
+						</div>
+					</>
+				)}
+				<div>
 					<p className="mt-4 text-center text-white">
 						已經有帳號了嗎 ?{" "}
 						<Link to="/login">
@@ -82,6 +167,19 @@ function Card({ onClick, img, label }) {
 			<p className="text-lg font-semibold text-gray-800 group-hover:text-pink-500 transition">
 				{label}
 			</p>
+		</div>
+	);
+}
+
+function InputColumn({ columnName, placeHolder }) {
+	return (
+		<div>
+			<label className="">{columnName}</label>
+			<input
+				type="text"
+				placeholder={placeHolder}
+				className="w-full px-3 py-2 border border-gray-300 rounded mb-4 mt-1"
+			/>
 		</div>
 	);
 }
