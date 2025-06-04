@@ -1,6 +1,10 @@
 // src/App.jsx
 import { Routes, Route, useNavigate } from 'react-router-dom'
 import TestBack from './TestBack.jsx'
+import HomePage from './pages/HomePage.jsx'
+import LoginPage from './pages/LoginPage.jsx'
+import Register from './pages/Register.jsx'
+import NotFoundPage from './pages/NotFoundPage.jsx'
 
 function Home() {
   const navigate = useNavigate()
@@ -27,6 +31,12 @@ export default function App() {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/testback" element={<TestBack />} />
+      <Route path="/home" element={<HomePage />} />
+      <Route path="/login" element={<LoginPage/>}/>
+      <Route path="/register" element={<Register/>}/>
+
+      {/* 其他路由(不存在的路由:顯示404 not found) */}
+      <Route path="*" element={<NotFoundPage/>}/>
     </Routes>
   )
 }
