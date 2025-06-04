@@ -3,7 +3,7 @@ import { Routes, Route, useNavigate } from 'react-router-dom'
 import TestBack from './TestBack.jsx'
 import HomePage from './pages/HomePage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
-import Register from './pages/Register.jsx'
+import RegisterPage from './pages/RegisterPage.jsx'
 import NotFoundPage from './pages/NotFoundPage.jsx'
 
 function Home() {
@@ -72,7 +72,7 @@ export default function App() {
       <Route path="/testback" element={<TestBack />} />
       <Route path="/home" element={<HomePage />} />
       <Route path="/login" element={<LoginPage/>}/>
-      <Route path="/register" element={<Register/>}/>
+      <Route path="/register" element={<RegisterPage/>}/>
 
       {/* 其他路由(不存在的路由:顯示404 not found) */}
       <Route path="*" element={<NotFoundPage/>}/>
