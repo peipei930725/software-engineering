@@ -1,5 +1,5 @@
 // src/App.jsx
-import { Routes, Route, useNavigate } from 'react-router-dom'
+import { Routes, Route, useNavigate, Navigate } from 'react-router-dom'
 import TestBack from './TestBack.jsx'
 import HomePage from './pages/HomePage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
@@ -11,6 +11,7 @@ import NotFoundPage from './pages/NotFoundPage.jsx'
 export default function App() {
   return (
     <Routes>
+      <Route path="/" element={<Navigate to="/home" replace />} />
       <Route path="/testback" element={<TestBack />} />
       <Route path="/home" element={<HomePage />} />
       <Route path="/login" element={<LoginPage/>}/>
