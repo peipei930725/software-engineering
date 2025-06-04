@@ -21,7 +21,7 @@ export default function TestBack() {
 const handlePost = async () => {
     try {
       // 將輸入框內容包成 JSON 傳給後端
-    const res = await fetch('http://127.0.0.1:5000/api/login', {
+    const res = await fetch('http://127.0.0.1:5000/api/echo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: inputText })
