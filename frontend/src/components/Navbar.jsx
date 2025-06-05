@@ -11,7 +11,7 @@ function Navbar({ isLoggedIn, username }) {
 					</div>
 				</Link>
 				<ul className="flex space-x-6 text-xl">
-					<Link to="">
+					<Link to="/info">
 						<li className="hover:underline text-white">最新消息</li>
 					</Link>
 					<Link to="">
