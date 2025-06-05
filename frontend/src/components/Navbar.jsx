@@ -1,25 +1,82 @@
 import { Link } from "react-router-dom";
+import { useUser } from "../contexts/UserContext";
 
-function Navbar({ isLoggedIn, username }) {
+function getRoleDisplayName(role) {
+	const roleNames = {
+		student: "學生",
+		admin: "管理員",
+		judge: "評審",
+		teacher: "老師",
+	};
+	return roleNames[role] || "role";
+}
+
+function Navbar() {
+	const { userInfo, handleLogout } = useUser();
+	const { isLoggedIn, username, role } = userInfo;
+
+	const getMenuItems = () => {
+		const commonItems = [{ to: "/info", label: "最新消息" }];
+
+		const roleMenus = {
+			student: [
+				...commonItems,
+				{ to: "", label: "報名參賽" },
+				{ to: "", label: "歷屆作品" },
+				{ to: "", label: "申訴系統" },
+			],
+			admin: [
+				{ to: "", label: "申訴接收" },
+				{ to: "", label: "公告編輯" },
+				{ to: "", label: "查詢資料" },
+				{ to: "", label: "編輯成員" },
+				{ to: "", label: "指派評審" },
+			],
+			judge: [
+				...commonItems,
+				{ to: "", label: "歷屆作品" },
+				{ to: "", label: "評審作品" },
+				{ to: "", label: "評分編輯" },
+			],
+			teacher: [
+				...commonItems,
+				{ to: "", label: "歷屆作品" },
+				{ to: "", label: "申訴系統" },
+			],
+		};
+
+		if (isLoggedIn && role && roleMenus) {
+			return roleMenus[role];
+		}
+
+		return [
+			...commonItems,
+			{ to: "/competition/info", label: "報名參賽" },
+			{ to: "/competition/history", label: "歷屆作品" },
+		];
+	};
+
+	const menuItems = getMenuItems();
+
 	return (
 		<nav className="fixed top-0 w-full z-50 bg-[#023047] text-white flex justify-between items-center px-8 py-4 shadow-md">
 			{/* 左側: Logo + Menu */}
 			<div className="flex items-center space-x-10">
-				<Link to="/home">
+				<Link to="/">
 					<div className="text-2xl font-semibold text-white">
 						2025 ICCMS
 					</div>
 				</Link>
 				<ul className="flex space-x-6 text-xl">
-					<Link to="/info">
-						<li className="hover:underline text-white">最新消息</li>
-					</Link>
-					<Link to="">
-						<li className="hover:underline text-white">報名參賽</li>
-					</Link>
-					<Link to="">
-						<li className="hover:underline text-white">歷屆作品</li>
-					</Link>
+					{menuItems.map((item, index) => (
+						<>
+							<Link key={index} to={item.to}>
+								<li className="hover:underline text-white">
+									{item.label}
+								</li>
+							</Link>
+						</>
+					))}
 				</ul>
 			</div>
 
@@ -27,8 +84,26 @@ function Navbar({ isLoggedIn, username }) {
 			<div className="flex space-x-4 text-sm">
 				{isLoggedIn ? (
 					<>
-						<span>{username}</span>
-						<button className="hover:underline">登出</button>
+						{role === "student" && (
+							<Link to="/team" className="flex items-center">
+								<p className="text-xl hover:underline cursor-pointer text-white flex items-center">
+									我的隊伍
+								</p>
+							</Link>
+						)}
+						<span className="flex items-center space-x-2 text-base">
+							<span>{username}</span>
+							{role && <span>{getRoleDisplayName(role)}</span>}
+						</span>
+						<Link to="/edit">
+							<button className="text-white">修改資料</button>
+						</Link>
+						<button
+							className="hover:underline"
+							onClick={handleLogout}
+						>
+							登出
+						</button>
 					</>
 				) : (
 					<>

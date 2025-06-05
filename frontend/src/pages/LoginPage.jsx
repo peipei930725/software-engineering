@@ -1,22 +1,27 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useUser } from "../contexts/UserContext";
 
 function LoginPage() {
 	const [idNumber, setIdNumber] = useState("");
 	const [password, setPassword] = useState("");
 	const [error, setError] = useState("");
+	const [isLoading, setIsLoading] = useState(false);
+	const { setUserInfo, fetchUserInfo } = useUser(); // 添加 fetchUserInfo
 	const navigate = useNavigate();
 
-	const handleSumbit = async (e) => {
+	const handleSubmit = async (e) => { // 修正函數名稱拼寫
 		e.preventDefault();
 		setError("");
+		setIsLoading(true); // 添加載入狀態
 
 		try {
-			const response = await fetch("http:localhost:5000/api/login", {
+			const response = await fetch("http://localhost:5000/api/login", { // 修正 URL (缺少冒號)
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
 				},
+				credentials: 'include', // 添加這行以支援 cookies/sessions
 				body: JSON.stringify({
 					idNumber: idNumber,
 					password: password,
@@ -26,16 +31,30 @@ function LoginPage() {
 			const data = await response.json();
 
 			if (response.ok && data.success) {
-				// 登入成功，可儲存資料後導向首頁
-				// e.g. localStorage.setItem("username", data.username);
+				// 登入成功後更新用戶狀態
+				if (fetchUserInfo) {
+					// 如果有 fetchUserInfo 函數，使用它來獲取完整的用戶資訊
+					await fetchUserInfo();
+				} else {
+					// 或者直接設置從登入 API 返回的用戶資訊
+					setUserInfo({
+						isLoggedIn: true,
+						username: data.username || data.user?.username,
+						role: data.role || data.user?.role
+					});
+				}
+				
 				navigate("/home");
 			} else {
 				setError(data.message || "登入失敗");
 			}
 		} catch (err) {
+			console.error("登入錯誤:", err); // 添加錯誤日誌
 			setError("無法連接至伺服器。");
+		} finally {
+			setIsLoading(false); // 結束載入狀態
 		}
-	}
+	};
 
 	return (
 		<>
@@ -44,23 +63,27 @@ function LoginPage() {
 					<h2 className="text-2xl font-semibold mb-6 text-center">
 						登入
 					</h2>
-					<form className="space-y-4">
+					<form className="space-y-4" onSubmit={handleSubmit}> {/* 添加 onSubmit 到 form */}
 						<div>
 							<label className="block mb-1">身分證字號</label>
 							<input
 								type="text"
+								value={idNumber} // 添加 value 屬性
 								className="w-full px-3 py-2 border border-gray-300 rounded"
 								placeholder="請輸入身分證字號"
 								onChange={(e) => setIdNumber(e.target.value)}
+								required // 添加必填驗證
 							/>
 						</div>
 						<div>
 							<label className="block mb-1">密碼</label>
 							<input
 								type="password"
+								value={password} // 添加 value 屬性
 								className="w-full px-3 py-2 border border-gray-300 rounded"
 								placeholder="請輸入密碼"
 								onChange={(e) => setPassword(e.target.value)}
+								required // 添加必填驗證
 							/>
 						</div>
 						{error && (
@@ -68,26 +91,27 @@ function LoginPage() {
 						)}
 						<button
 							type="submit"
-							className="w-full bg-[#023047] text-white py-2 rounded hover:bg-[#03537d]"
-							onClick={handleSumbit}
+							className="w-full bg-[#023047] text-white py-2 rounded hover:bg-[#03537d] disabled:opacity-50 disabled:cursor-not-allowed" // 添加禁用狀態樣式
+							disabled={isLoading} // 載入時禁用按鈕
 						>
-							<span>登入</span>
+							<span>{isLoading ? "登入中..." : "登入"}</span> {/* 動態顯示按鈕文字 */}
 						</button>
 					</form>
 				</div>
 				<div>
-					<p className="mt-4 text-center text-white" />
+					<p className="mt-4 text-center text-white"> {/* 修正 JSX 語法 */}
 						還沒有帳號嗎 ?{" "}
 						<Link to="/register">
 							<span className="text-blue-500 hover:underline hover:text-blue-200">
 								註冊
 							</span>
 						</Link>
-						<Link to="/home">
-							<p className="text-blue-300 hover:underline mt-2 text-center">
-								回首頁
-							</p>
-						</Link>
+					</p> {/* 修正標籤結構 */}
+					<Link to="/home">
+						<p className="text-blue-300 hover:underline mt-2 text-center">
+							回首頁
+						</p>
+					</Link>
 				</div>
 			</div>
 		</>
