@@ -5,7 +5,7 @@ function Navbar({ isLoggedIn, username }) {
 		<nav className="fixed top-0 w-full z-50 bg-[#023047] text-white flex justify-between items-center px-8 py-4 shadow-md">
 			{/* 左側: Logo + Menu */}
 			<div className="flex items-center space-x-10">
-				<Link>
+				<Link to="/home">
 					<div className="text-2xl font-semibold text-white">
 						2025 ICCMS
 					</div>
@@ -13,9 +13,6 @@ function Navbar({ isLoggedIn, username }) {
 				<ul className="flex space-x-6 text-xl">
 					<Link to="/info">
 						<li className="hover:underline text-white">最新消息</li>
-					</Link>
-					<Link to="">
-						<li className="hover:underline text-white">報名方法</li>
 					</Link>
 					<Link to="">
 						<li className="hover:underline text-white">報名參賽</li>
