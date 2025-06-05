@@ -19,6 +19,9 @@ function Navbar({ isLoggedIn, username }) {
 					<Link to="/projects">
 						<li className="hover:underline text-white">歷屆作品</li>
 					</Link>
+					<Link to="/appeal">
+						<li className="hover:underline text-white">申訴管道</li>
+					</Link>
 				</ul>
 			</div>
 
