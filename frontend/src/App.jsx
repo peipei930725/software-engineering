@@ -5,6 +5,8 @@ import HomePage from './pages/HomePage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
 import RegisterPage from './pages/RegisterPage.jsx'
 import NotFoundPage from './pages/NotFoundPage.jsx'
+import BrowseProjectPage from "./pages/BrowseProjectPage.jsx";
+import TeamRegisterPage from './pages/TeamRegisterPage.jsx'
 
 
 // App 主元件
@@ -16,6 +18,8 @@ export default function App() {
       <Route path="/home" element={<HomePage />} />
       <Route path="/login" element={<LoginPage/>}/>
       <Route path="/register" element={<RegisterPage/>}/>
+      <Route path="/projects" element={<BrowseProjectPage />} />
+      <Route path="/teamreg" element={<TeamRegisterPage />} />
 
       {/* 其他路由(不存在的路由:顯示404 not found) */}
       <Route path="*" element={<NotFoundPage/>}/>

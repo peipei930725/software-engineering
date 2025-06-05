@@ -1,6 +1,7 @@
 import Navbar from "../components/Navbar.jsx";
 import Announcement from "../components/Announcement.jsx";
 
+
 function HomePage() {
 	return (
 		<>
