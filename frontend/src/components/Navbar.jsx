@@ -21,9 +21,9 @@ function Navbar() {
 		const roleMenus = {
 			student: [
 				...commonItems,
-				{ to: "", label: "報名參賽" },
-				{ to: "", label: "歷屆作品" },
-				{ to: "", label: "申訴系統" },
+				{ to: "/teamreg", label: "報名參賽" },
+				{ to: "/projects", label: "歷屆作品" },
+				{ to: "/appeal", label: "申訴系統" },
 			],
 			admin: [
 				{ to: "", label: "申訴接收" },
@@ -34,14 +34,14 @@ function Navbar() {
 			],
 			judge: [
 				...commonItems,
-				{ to: "", label: "歷屆作品" },
+				{ to: "/projects", label: "歷屆作品" },
 				{ to: "", label: "評審作品" },
 				{ to: "", label: "評分編輯" },
 			],
 			teacher: [
 				...commonItems,
-				{ to: "", label: "歷屆作品" },
-				{ to: "", label: "申訴系統" },
+				{ to: "/projects", label: "歷屆作品" },
+				{ to: "/appeal", label: "申訴系統" },
 			],
 		};
 

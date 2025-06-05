@@ -2,6 +2,7 @@ import Navbar from "../components/Navbar.jsx";
 import Announcement from "../components/Announcement.jsx";
 import { useUser } from "../contexts/UserContext.jsx";
 
+
 function HomePage() {
 	const { userInfo } = useUser();
 	

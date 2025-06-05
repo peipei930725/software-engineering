@@ -20,8 +20,8 @@ def create_app():
 
     # auth
     from .auth.auth import auth_api
-    app.register_blueprint(auth_api)
-
+    app.register_blueprint(auth_api, url_prefix="/api")
+    
     # report
     from .report.report import report_bp
     app.register_blueprint(report_bp)
