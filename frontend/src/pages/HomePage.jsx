@@ -1,11 +1,12 @@
 import Navbar from "../components/Navbar.jsx";
 import Announcement from "../components/Announcement.jsx";
 
+
 function HomePage() {
 	return (
 		<>
 			<Navbar />
-			<div className="bg-[#023047] text-white pt-32 h-screen w-screen m-0">
+			<div className="bg-[#023047] text-white pt-32 min-h-screen w-screen m-0">
 				{/* 主標題 */}
 				<header className="text-center mt-12">
 					<h1 className="text-3xl md:text-4xl font-semibold">

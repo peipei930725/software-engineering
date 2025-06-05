@@ -19,11 +19,9 @@ def create_app():
     app.register_blueprint(echo_bp)
 
     # auth
-    from .auth.login import auth_bp
-    app.register_blueprint(auth_bp)
-    from .auth.register import register_bp
-    app.register_blueprint(register_bp)
-
+    from .auth.auth import auth_api
+    app.register_blueprint(auth_api, url_prefix="/api")
+    
     # report
     from .report.report import report_bp
     app.register_blueprint(report_bp)
