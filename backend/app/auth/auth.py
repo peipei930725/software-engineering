@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, request, current_app
+from sqlalchemy import text
 from app import db             # 從 app/__init__.py 匯入已初始化的 SQLAlchemy 實例
 import json
 
@@ -30,18 +31,34 @@ def login():
         return ("", 200)
 
     data = request.get_json() or {}
-    ID_num = data.get("idNumber") or data.get("ID_num")  # 前端傳 idNumber 或 ID_num 都嘗試讀取
+    # 前端可能傳 idNumber 或 ID_num，兩種都嘗試讀取
+    ID_num = data.get("idNumber") or data.get("ID_num")
     password = data.get("password")
 
     print("登入資料:", data)
     if not ID_num or not password:
         return jsonify({"message": "學號或密碼缺失", "error": True}), 400
 
-    # 使用 raw SQL 查詢所有使用者
+    # 使用原生 SQL 查詢所有使用者
     try:
-        # 假設你的資料庫中有一張叫做 "user" 的 table，且該 table 有以下欄位：
-        # u_id, ID_num, name, phone, email, password, address, is_admin, admin_type, is_rater, rater_title, is_student, is_teacher
-        sql = "SELECT u_id, ID_num, name, phone, email, password, address, is_admin, admin_type, is_rater, rater_title, is_student, is_teacher FROM \"user\""
+        # 若是 PostgreSQL，user 是保留字，需要加雙引號；若是 MySQL 可去掉引號
+        sql = text("""
+            SELECT 
+                u_id, 
+                ID_num, 
+                name, 
+                phone, 
+                email, 
+                password, 
+                address, 
+                is_admin, 
+                admin_type, 
+                is_rater, 
+                rater_title, 
+                is_student, 
+                is_teacher 
+            FROM "user"
+        """)
         result_proxy = db.session.execute(sql)
         rows = result_proxy.fetchall()
         print("讀取到的資料筆數:", len(rows))
