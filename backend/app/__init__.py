@@ -6,7 +6,14 @@ db = SQLAlchemy()
 
 def create_app():
     app = Flask(__name__)
-    CORS(app)
+
+    # 僅允許前端 http://localhost:5173 可以跨域，並且開啟 credentials
+    CORS(
+        app,
+        resources={r"/api/*": {"origins": "http://localhost:5173"}},
+        supports_credentials=True
+    )
+
     app.config.from_object('app.config.Config')
     db.init_app(app)
 
