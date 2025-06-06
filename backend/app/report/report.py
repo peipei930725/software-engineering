@@ -6,5 +6,14 @@ report_bp = Blueprint('report', __name__)
 
 @report_bp.route('/api/report', methods=['POST'])
 def report():
+    data = request.get_json() or {}
+    if not data:
+        return jsonify({"message": "No data provided"}), 400
+    Id = data.get("id")
+    content = data.get("content")
+    if not Id or not content:
+        return jsonify({"message": "請填寫完整"}), 400
     
-    return jsonify({"message": "Hello from Flask!"})
+
+    print(f"申述人: {Id}\n內容: {content}")
+    return jsonify({"message": "成功提交"}),200
