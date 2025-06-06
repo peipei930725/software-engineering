@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useUser } from "../contexts/UserContext";
 
 function TeamRegisterPage() {
   const [form, setForm] = useState({
@@ -16,6 +17,14 @@ function TeamRegisterPage() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+
+  const { userInfo } = useUser();
+  useEffect(() => {
+		if (!userInfo.isLoggedIn || userInfo.role !== "student") {
+			// 有登入 而且 是學收  => 沒登入 或 不是學生
+			navigate("/login");
+		}
+  }, [userInfo, navigate]);
 
   // 表單變更處理
   const handleChange = (e) => {
@@ -52,7 +61,7 @@ function TeamRegisterPage() {
         setError(data.msg || "註冊失敗，請檢查資料。");
       }
     } catch (err) {
-      setError("無法連接伺服器");
+      setError(`無法連接伺服器。${err}`);
     }
     setIsLoading(false);
   };
@@ -66,7 +75,7 @@ function TeamRegisterPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* 重要提醒 */}
           <div>
-            <div className="text-lg font-semibold text-red-600 mb-2">
+            <div className="text-2xl font-semibold text-red-600 mb-2">
               重要：自己的身分證字號也需填入！
             </div>
             <div className="text-base text-gray-700 mb-2">
@@ -83,9 +92,9 @@ function TeamRegisterPage() {
           <InputColumn
             label="學生1的身分證字號"
             name="student1_id"
-            value={form.student1_id}
-            onChange={handleChange}
+            value={userInfo.idNumber}
             required
+            disabled
           />
           <InputColumn
             label="學生2的身分證字號"
@@ -156,7 +165,7 @@ function TeamRegisterPage() {
 }
 
 // 單一輸入欄位元件
-function InputColumn({ label, name, value, onChange, required }) {
+function InputColumn({ label, name, value, onChange, required, disabled }) {
   return (
     <div>
       <label className="block font-semibold mb-1">
@@ -170,6 +179,7 @@ function InputColumn({ label, name, value, onChange, required }) {
         onChange={onChange}
         placeholder={`輸入${label}`}
         required={required}
+        disabled={disabled}
         className="w-full px-3 py-2 border border-gray-300 rounded mb-1 mt-1 text-base focus:outline-none focus:ring-2 focus:ring-blue-200"
       />
     </div>

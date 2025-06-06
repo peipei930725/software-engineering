@@ -54,7 +54,7 @@ export default function ProjectGallery() {
         setLoading(false);
       })
       .catch(err => {
-        setError("後端連線失敗，顯示預設資料");
+        setError(`後端連線失敗，顯示預設資料。${err}`);
         setLoading(false);
       });
   }, []);

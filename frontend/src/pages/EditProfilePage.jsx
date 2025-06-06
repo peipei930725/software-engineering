@@ -22,6 +22,13 @@ function EditProfilePage() {
   const navigate = useNavigate();
 
   useEffect(() => {
+		if (!userInfo.isLoggedIn) {
+			// 有登入 而且 是管理員  => 沒登入 或 不是管理員
+			navigate("/login");
+		}
+  }, [userInfo, navigate]);
+
+  useEffect(() => {
     if (!userInfo.isLoggedIn || !userInfo.username) {
       setError("未登入或找不到用戶資訊");
       return;
@@ -54,6 +61,7 @@ function EditProfilePage() {
         } else {
           setProfile(STATIC_PROFILE);
         }
+        console.log(err);
       });
   }, [userInfo]);
 
@@ -80,7 +88,7 @@ function EditProfilePage() {
         setError(data.msg || "更新失敗");
       }
     } catch (err) {
-      setError("無法連接伺服器");
+      setError(`無法連接伺服器。${err}`);
     }
   };
 

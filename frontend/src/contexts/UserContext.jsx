@@ -18,7 +18,8 @@ export const UserProvider = ({ children }) => {
 	const [userInfo, setUserInfo] = useState({
 		isLoggedIn: false,
 		username: '',
-		role: '' // 'student', 'admin', 'judge', 'teacher'
+		role: '', // 'student', 'admin', 'judge', 'teacher'
+		idNumber: '' // 身分證字號/SSD/ID_Num
 	});
 
 	// 從後端獲取用戶資訊的函數
@@ -37,14 +38,16 @@ export const UserProvider = ({ children }) => {
 				setUserInfo({
 					isLoggedIn: true,
 					username: data.username,
-					role: data.role
+					role: data.role,
+					idNumber: data.idNumber, // 假設後端返回 idNumber
 				});
 			} else {
 				// 用戶未登入或 token 無效
 				setUserInfo({
 					isLoggedIn: false,
 					username: '',
-					role: ''
+					role: '',
+					idNumber: ''
 				});
 			}
 		} catch (error) {
@@ -52,7 +55,8 @@ export const UserProvider = ({ children }) => {
 			setUserInfo({
 				isLoggedIn: false,
 				username: '',
-				role: ''
+				role: '',
+				idNumber: ''
 			});
 		}
 	};
@@ -67,7 +71,8 @@ export const UserProvider = ({ children }) => {
 			setUserInfo({
 				isLoggedIn: false,
 				username: '',
-				role: ''
+				role: '',
+				idNumber: ''
 			});
 		} catch (error) {
 			console.error('登出失敗:', error);
@@ -81,7 +86,8 @@ export const UserProvider = ({ children }) => {
 		// setUserInfo({
 		// 	isLoggedIn: true,
 		// 	username: '王大明', // 測試用戶名
-		// 	role: 'student' // 測試角色
+		// 	role: 'student', // 測試角色
+		// 	idNumber: 'A123456789' // 測試身分證字號
 		// });
 	}, []);
 

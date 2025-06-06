@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar.jsx";
+import { useUser } from "../contexts/UserContext.jsx";
 
 function AppealPage() {
 	const [form, setForm] = useState({
@@ -7,6 +9,18 @@ function AppealPage() {
 		content: "",
 	});
 	const [message, setMessage] = useState("");
+
+	const { userInfo } = useUser();
+	const navigate = useNavigate();
+
+	// 檢查使用者是否已登入且角色為學生或老師
+	// 如果沒有登入或不是學生或老師，則重定向到登入頁面
+	useEffect(() => {
+		if (!userInfo.isLoggedIn || !(userInfo.role === "student" || userInfo.role === "teacher")) {
+			// 有登入 而且 是老師或學生  => 沒登入 或 不是(老師或學生)
+			navigate("/login");
+		}  
+	}, [userInfo, navigate]);
 
 	const handleChange = (e) => {
 		setForm({ ...form, [e.target.name]: e.target.value });
@@ -29,7 +43,7 @@ function AppealPage() {
 				setMessage(data.message || "送出失敗，請稍後再試。");
 			}
 		} catch (err) {
-			setMessage("伺服器連線失敗，請稍後再試。");
+			setMessage(`伺服器連線失敗，請稍後再試。${err}`);
 		}
 	};
 
@@ -42,7 +56,7 @@ function AppealPage() {
 						申訴專區
 					</h1>
 				</header>
-				<section className="mt-24 mx-auto w-11/12 h-7/12 md:w-4/5 bg-gray-300 text-black text-center text-2xl font-bold rounded-lg p-8">
+				<section className="mt-8 mx-auto w-11/12 h-7/12 md:w-4/5 bg-gray-300 text-black text-center text-2xl font-bold rounded-lg p-8">
 					<p>
 						如有任何比賽相關問題、異議或申訴事項，請填寫下方表單我們將儘快處理您的申訴。
 					</p>
@@ -54,7 +68,8 @@ function AppealPage() {
 					<form className="space-y-6" onSubmit={handleSubmit}>
 						<div>
 							<label className="block font-semibold mb-2">
-								身分證字號 <span className="text-red-600">*</span>
+								身分證字號{" "}
+								<span className="text-red-600">*</span>
 							</label>
 							<input
 								type="text"

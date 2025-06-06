@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar.jsx";
 import { useUser } from "../contexts/UserContext.jsx";
 
@@ -13,6 +14,14 @@ function AnnouncementPage() {
   const [msg, setMsg] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const navigate = useNavigate();
+  useEffect(() => {
+		if (!userInfo.isLoggedIn || userInfo.role !== "admin") {
+			// 有登入 而且 是管理員  => 沒登入 或 不是管理員
+			navigate("/login");
+		}
+  }, [userInfo, navigate]);
 
   // 預設自動填入現在時間
   useEffect(() => {
@@ -92,9 +101,9 @@ function AnnouncementPage() {
   return (
     <>
       <Navbar />
-      <div className="bg-[#f4f4f9] min-h-screen w-screen m-0">
+      <div className="bg-[#023047] min-h-screen w-screen m-0 pt-32">
         {/* 新增公告表單，下移且內容全黑 */}
-        <div className="max-w-2xl mx-auto mt-24 mb-8 p-8 bg-white rounded-3xl shadow-2xl border border-gray-200 text-black">
+        <div className="max-w-2xl mx-auto mb-8 p-8 bg-white rounded-3xl shadow-2xl border border-gray-200 text-black">
           <div className="text-2xl font-bold mb-6 text-center text-[#007BFF] tracking-wider">
             新增公告
           </div>
@@ -128,7 +137,7 @@ function AnnouncementPage() {
               className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 transition text-black"
             />
             <div className="flex items-center gap-2">
-              <label className="font-semibold text-gray-700 text-black mb-0">
+              <label className="font-semibold text-black mb-0">
                 選擇發布時間：
               </label>
               <input

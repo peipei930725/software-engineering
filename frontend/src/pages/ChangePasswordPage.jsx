@@ -44,7 +44,7 @@ function ChangePasswordPage() {
         setError(data.msg || "密碼更新失敗");
       }
     } catch (err) {
-      setError("無法連接伺服器");
+      setError(`無法連接伺服器。${err}`);
     }
   };
 
