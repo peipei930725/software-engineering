@@ -1,11 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "../components/Navbar.jsx";
 
 export default function ProjectGallery() {
   const [search, setSearch] = useState("");
-
-  // 靜態作品資料
-  const projects = [
+  const [projects, setProjects] = useState([
+    // 預設靜態資料
     {
       title: "第3隊",
       team: "3",
@@ -34,7 +33,31 @@ export default function ProjectGallery() {
         { label: "文件連結", url: "https://www.youtube.com" }
       ]
     }
-  ];
+  ]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  // 嘗試從 Flask 後端抓資料（加上 credentials: 'include'）
+  useEffect(() => {
+    setLoading(true);
+    fetch("http://localhost:5000/api/projects", {
+      credentials: 'include' // 這裡加上
+    })
+      .then(res => {
+        if (!res.ok) throw new Error("無法取得作品資料");
+        return res.json();
+      })
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          setProjects(data);
+        }
+        setLoading(false);
+      })
+      .catch(err => {
+        setError("後端連線失敗，顯示預設資料");
+        setLoading(false);
+      });
+  }, []);
 
   // 過濾搜尋
   const filteredProjects = projects.filter(project =>
@@ -45,16 +68,13 @@ export default function ProjectGallery() {
     <>
       <Navbar />
       <div className="bg-[#023047] text-white pt-32 min-h-screen w-screen m-0">
-        {/* 主標題 */}
         <header className="text-center mt-12">
           <h1 className="text-3xl md:text-4xl font-semibold">
             歷屆學生作品展示
           </h1>
         </header>
 
-        {/* 搜尋與作品列表 */}
         <section className="mt-24 mx-auto w-11/12 md:w-4/5">
-          {/* 搜尋區塊 */}
           <div className="flex justify-center mb-8">
             <input
               type="text"
@@ -64,7 +84,12 @@ export default function ProjectGallery() {
               className="px-4 py-2 w-72 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-200 text-white"
             />
           </div>
-          {/* 作品列表 */}
+          {loading && (
+            <div className="text-center text-lg text-white mb-8">載入中...</div>
+          )}
+          {error && (
+            <div className="text-center text-yellow-300 mb-8">{error}</div>
+          )}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
             {filteredProjects.map((project, idx) => (
               <div

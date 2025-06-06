@@ -1,28 +1,61 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useUser } from "../contexts/UserContext";
+
+const STATIC_PROFILE = {
+  name: "王小明",
+  email: "test@example.com",
+  phonenumber: "0912345678",
+  address: "高雄市楠梓區高雄大學路700號",
+  department: "資訊工程學系",
+  grade: "3",
+  sid: "A1115500",
+  degree: "國立高雄大學電機工程學系博士",
+  title: "國立高雄大學校長"
+};
 
 function EditProfilePage() {
+  const { userInfo } = useUser();
   const [profile, setProfile] = useState(null);
   const [msg, setMsg] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  // 假設 ssn 來自登入狀態或 localStorage
-  const ssn = localStorage.getItem("ssn");
-
   useEffect(() => {
-    if (!ssn) {
-      setError("未登入或找不到身分資訊");
+    if (!userInfo.isLoggedIn || !userInfo.username) {
+      setError("未登入或找不到用戶資訊");
       return;
     }
-    fetch(`http://localhost:5000/api/profile?ssn=${ssn}`)
+    fetch(`/api/profile?ssn=${encodeURIComponent(userInfo.username)}`, {
+      credentials: 'include' // ← 這裡加上
+    })
       .then(res => {
         if (!res.ok) throw new Error("載入失敗");
         return res.json();
       })
       .then(data => setProfile(data))
-      .catch(err => setError(err.message));
-  }, [ssn]);
+      .catch(err => {
+        setError("後端連線失敗，顯示預設資料");
+        if (userInfo.role === "student") {
+          setProfile({
+            ...STATIC_PROFILE,
+            identity: "student"
+          });
+        } else if (userInfo.role === "teacher") {
+          setProfile({
+            ...STATIC_PROFILE,
+            identity: "teacher"
+          });
+        } else if (userInfo.role === "judge") {
+          setProfile({
+            ...STATIC_PROFILE,
+            identity: "judge"
+          });
+        } else {
+          setProfile(STATIC_PROFILE);
+        }
+      });
+  }, [userInfo]);
 
   const handleChange = (e) => {
     setProfile({ ...profile, [e.target.name]: e.target.value });
@@ -33,9 +66,10 @@ function EditProfilePage() {
     setMsg("");
     setError("");
     try {
-      const res = await fetch("http://localhost:5000/api/profile", {
+      const res = await fetch("/api/profile", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: 'include', // ← 這裡加上
         body: JSON.stringify(profile),
       });
       const data = await res.json();
@@ -50,9 +84,9 @@ function EditProfilePage() {
     }
   };
 
-  if (error)
+  if (error && !profile)
     return (
-      <div className="bg-[#023047] min-h-screen flex items-center justify-center text-red-500 text-xl">
+      <div className="bg-[#023047] min-h-screen flex items-center justify-center text-yellow-200 text-xl">
         {error}
       </div>
     );
@@ -66,14 +100,13 @@ function EditProfilePage() {
 
   return (
     <div className="bg-[#023047] min-h-screen w-screen m-0 flex flex-col items-center justify-center inset-0 overflow-y-auto pb-4 pt-10 relative">
-      {/* 右上角創意返回按鈕 */}
-      <Link
-        to="/console"
+      {/* 右上角返回上一頁按鈕 */}
+      <button
+        onClick={() => window.history.back()}
         className="fixed top-8 right-8 z-50 group"
         style={{ textDecoration: "none" }}
       >
         <div className="flex items-center px-5 py-2 bg-gradient-to-r from-blue-400 via-pink-400 to-yellow-400 rounded-full shadow-lg hover:scale-110 hover:shadow-2xl transition-transform duration-300 cursor-pointer">
-          {/* 原生 SVG icon */}
           <svg
             className="w-6 h-6 text-white mr-2 group-hover:-translate-x-1 transition-transform duration-300"
             fill="none"
@@ -88,10 +121,10 @@ function EditProfilePage() {
             />
           </svg>
           <span className="font-bold text-white text-base group-hover:text-yellow-200 transition-colors">
-            返回個人資料
+            返回上一頁
           </span>
         </div>
-      </Link>
+      </button>
 
       <div className="bg-white text-black rounded-3xl shadow-2xl border border-white/30 p-10 md:p-12 max-w-4xl w-full">
         <h2 className="text-2xl font-bold mb-8 text-black text-center">
@@ -127,7 +160,7 @@ function EditProfilePage() {
             onChange={handleChange}
           />
           {/* 身分專屬欄位 */}
-          {profile.identity === "student" && (
+          {userInfo.role === "student" && (
             <>
               <InputColumn
                 columnName="系所"
@@ -163,7 +196,7 @@ function EditProfilePage() {
               />
             </>
           )}
-          {profile.identity === "teacher" && (
+          {userInfo.role === "teacher" && (
             <InputColumn
               columnName="學歷"
               placeHolder="請輸入學歷"
@@ -172,7 +205,7 @@ function EditProfilePage() {
               onChange={handleChange}
             />
           )}
-          {profile.identity === "judge" && (
+          {userInfo.role === "judge" && (
             <InputColumn
               columnName="頭銜"
               placeHolder="請輸入頭銜"
@@ -190,6 +223,11 @@ function EditProfilePage() {
           {msg && (
             <div className="mt-4 text-center text-green-600 font-semibold">
               {msg}
+            </div>
+          )}
+          {error && profile && (
+            <div className="mt-4 text-center text-yellow-500 font-semibold">
+              {error}
             </div>
           )}
         </form>

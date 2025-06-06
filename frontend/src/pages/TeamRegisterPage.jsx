@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function TeamRegisterPage() {
-  // 預設表單狀態
   const [form, setForm] = useState({
     name: "",
     student1_id: "",
@@ -13,6 +12,10 @@ function TeamRegisterPage() {
     student6_id: "",
     professor_id: "",
   });
+  const [msg, setMsg] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   // 表單變更處理
   const handleChange = (e) => {
@@ -22,11 +25,36 @@ function TeamRegisterPage() {
     });
   };
 
-  // 表單送出（可根據需求改為 fetch 或 axios 傳送到後端）
-  const handleSubmit = (e) => {
+  // 表單送出
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // 這裡可以加上表單驗證與送出邏輯
-    alert("表單已送出（請自行串接後端）");
+    setMsg("");
+    setError("");
+
+    // 基本必填欄位驗證
+    if (!form.name || !form.student1_id || !form.student2_id) {
+      setError("隊伍名稱、學生1和學生2的身分證字號為必填！");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const res = await fetch("http://localhost:5000/api/team/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setMsg(data.msg || "隊伍註冊成功！");
+        setTimeout(() => navigate("/home"), 1500);
+      } else {
+        setError(data.msg || "註冊失敗，請檢查資料。");
+      }
+    } catch (err) {
+      setError("無法連接伺服器");
+    }
+    setIsLoading(false);
   };
 
   return (
@@ -98,10 +126,21 @@ function TeamRegisterPage() {
           />
           <button
             type="submit"
-            className="w-full py-3 mt-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition"
+            className="w-full py-3 mt-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
+            disabled={isLoading}
           >
-            確認報名隊伍
+            {isLoading ? "送出中..." : "確認報名隊伍"}
           </button>
+          {error && (
+            <div className="mt-2 text-center text-red-500 font-semibold">
+              {error}
+            </div>
+          )}
+          {msg && (
+            <div className="mt-2 text-center text-green-600 font-semibold">
+              {msg}
+            </div>
+          )}
         </form>
         <div className="text-center mt-6">
           <Link
