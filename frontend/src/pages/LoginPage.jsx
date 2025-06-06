@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useUser } from "../contexts/UserContext";
 
@@ -7,8 +7,16 @@ function LoginPage() {
 	const [password, setPassword] = useState("");
 	const [error, setError] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
-	const { setUserInfo, fetchUserInfo } = useUser(); // 添加 fetchUserInfo
+
+	const { userInfo, setUserInfo, fetchUserInfo } = useUser(); // 添加 fetchUserInfo
 	const navigate = useNavigate();
+
+	useEffect(() => {
+		if (userInfo.isLoggedIn) {
+			// 如果用戶已經登入，重定向到首頁
+			navigate("/home");
+		}
+	}, [userInfo.isLoggedIn, navigate]);
 
 	const handleSubmit = async (e) => { // 修正函數名稱拼寫
 		e.preventDefault();

@@ -1,10 +1,119 @@
-import { React, useState } from "react";
-import { Link } from "react-router-dom";
+import { React, useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useUser } from "../contexts/UserContext";
+
+/* JSON API will like this (e.g. student，會根據role不同有不同的欄位)
+	{
+		address: "高雄",
+		*department: "資工系",
+		email: "123@gmail",
+		*grade: "3",
+		idNumber: "A123456789",
+		name: "王大明",
+		password: "password123",
+		phone: "0912345678",
+		role: "student",
+		*studentId: "A1115521"
+	}
+	*/
+
+const fieldNameToLabel = {
+	name: "姓名",
+	email: "電子郵件",
+	password: "密碼",
+	phone: "手機號碼",
+	address: "地址",
+	idNumber: "身分證字號",
+	department: "系所",
+	grade: "年級",
+	studentId: "學號",
+	degree: "最高學歷",
+	title: "頭銜",
+};
 
 function RegisterPage() {
+	const navigate = useNavigate();
+	const { userInfo } = useUser();
+
+	useEffect(() => {
+		if (userInfo.isLoggedIn) {
+			navigate("/home");
+		}
+	}, [userInfo, navigate]);
+
 	const [selectedRole, setSelectedRole] = useState(null);
+	const [formData, setFormData] = useState({});
+	const [message, setMessage] = useState("");
+
+	// 檢查註冊的form有沒有null值 (使用者沒填的)
+	const validateForm = () => {
+		const commonFields = [
+			"name",
+			"email",
+			"password",
+			"phone",
+			"address",
+			"idNumber",
+		];
+		const roleSpecificFields = {
+			student: ["department", "grade", "studentId"],
+			teacher: ["degree"],
+			judge: ["title"],
+		};
+
+		// 合併所有需要檢查的欄位
+		const requiredFields = [
+			...commonFields,
+			...(roleSpecificFields[selectedRole] || []),
+		];
+
+		// 檢查是否有欄位為空
+		for (const field of requiredFields) {
+			if (!formData[field] || formData[field].trim() === "") {
+				setMessage(`請填寫完整欄位：「${fieldNameToLabel[field]}」`);
+				return false;
+			}
+		}
+		return true;
+	};
+
 	const handleRoleSelect = (role) => {
 		setSelectedRole(role);
+		setFormData({ role });
+		setMessage("");
+	};
+
+	const handleChange = (field, value) => {
+		setFormData((prev) => ({ ...prev, [field]: value }));
+	};
+
+	const handleSubmit = async () => {
+		if (!validateForm()) return;
+
+		//console.log("正在傳送的註冊資料: ", formData);
+		setMessage("註冊中...");
+
+		try {
+			const response = await fetch("http://localhost:5000/api/register", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(formData),
+			});
+
+			const data = await response.json();
+
+			if (response.ok) {
+				window.alert("註冊成功，請登入");
+				window.location.href = "/home";
+			} else {
+				setMessage(`註冊失敗： ${data.message || "請稍後再試"}}`);
+			}
+		} catch (err) {
+			console.error(err);
+			setMessage("註冊失敗，請稍後再試。");
+		}
 	};
 
 	const renderForm = () => {
@@ -13,46 +122,79 @@ function RegisterPage() {
 				<InputColumn
 					columnName="姓名"
 					placeHolder="請輸入姓名，例：王小明"
+					value={formData.name || ""}
+					onChange={(value) => handleChange("name", value)}
 				/>
 				<InputColumn
 					columnName="E-mail（電子郵件）"
 					placeHolder="請輸入E-mail，例：example@gmail.com"
+					value={formData.email || ""}
+					onChange={(value) => handleChange("email", value)}
 				/>
-				<InputColumn columnName="密碼" placeHolder="請輸入密碼" />
+				<InputColumn
+					columnName="密碼"
+					placeHolder="請輸入密碼"
+					value={formData.password || ""}
+					onChange={(value) => handleChange("password", value)}
+				/>
 				<InputColumn
 					columnName="手機號碼"
 					placeHolder="請輸入手機號碼，例：0912345678"
+					value={formData.phone || ""}
+					onChange={(value) => handleChange("phone", value)}
 				/>
 				<InputColumn
 					columnName="聯絡地址"
 					placeHolder="請輸入聯絡地址，例：高雄市楠梓區高雄大學路700號"
+					value={formData.address || ""}
+					onChange={(value) => handleChange("address", value)}
 				/>
 				<InputColumn
 					columnName="身分證字號（帳號）"
 					placeHolder="請輸入身分證字號，例：A123456789"
+					value={formData.idNumber || ""}
+					onChange={(value) => handleChange("idNumber", value)}
 				/>
 				{selectedRole === "judge" && (
 					<InputColumn
 						columnName="頭銜"
 						placeHolder="請輸入您的頭銜，例：國立高雄大學校長"
+						value={formData.title || ""}
+						onChange={(value) => handleChange("title", value)}
 					/>
 				)}
 				{selectedRole === "teacher" && (
 					<InputColumn
 						columnName="最高學歷"
 						placeHolder="例：國立高雄大學電機工程學系博士"
+						value={formData.degree || ""}
+						onChange={(value) => handleChange("degree", value)}
 					/>
 				)}
 				{selectedRole === "student" && (
 					<>
 						<InputColumn
 							columnName={"系所"}
-							placeHolder="請輸入系所，例：國立高雄大學資訊工程學系"
+							placeHolder="請輸入系所，例：資訊工程學系"
+							value={formData.department || ""}
+							onChange={(value) =>
+								handleChange("department", value)
+							}
 						/>
 						<div>
-							<label className="">年級</label><br/>
-							<select name="grade" id="" className="w-full px-3 py-2 border border-gray-300 rounded mb-4 mt-1">
-								<option value="" disabled selected>請選擇年級</option>
+							<label className="">年級</label>
+							<br />
+							<select
+								name="grade"
+								className="w-full px-3 py-2 border border-gray-300 rounded mb-4 mt-1"
+								value={formData.grade || ""}
+								onChange={(e) =>
+									handleChange("grade", e.target.value)
+								}
+							>
+								<option value="" disabled>
+									選擇您的年級
+								</option>
 								<option value="1">1</option>
 								<option value="2">2</option>
 								<option value="3">3</option>
@@ -62,6 +204,10 @@ function RegisterPage() {
 						<InputColumn
 							columnName={"學號"}
 							placeHolder="請輸入學號，例：A1115500"
+							value={formData.studentId || ""}
+							onChange={(value) =>
+								handleChange("studentId", value)
+							}
 						/>
 					</>
 				)}
@@ -117,6 +263,11 @@ function RegisterPage() {
 							</h2>
 
 							{renderForm()}
+							{message && (
+								<p className="mt-4 text-sm text-red-500">
+									{message}
+								</p>
+							)}
 							<button
 								className="mt-6 text-sm text-white hover:underline"
 								onClick={() => setSelectedRole(null)}
@@ -125,7 +276,7 @@ function RegisterPage() {
 							</button>
 							<button
 								className="!bg-green-500 mt-6 text-sm text-white hover:underline float-right px-6 py-2 rounded-md hover:!bg-green-600"
-								onClick={() => setSelectedRole(null)}
+								onClick={() => handleSubmit()}
 							>
 								確認註冊
 							</button>
@@ -133,7 +284,7 @@ function RegisterPage() {
 					</>
 				)}
 				<div>
-					<p className="mt-4 text-center text-white">
+					<div className="mt-4 text-center text-white">
 						已經有帳號了嗎 ?{" "}
 						<Link to="/login">
 							<span className="text-blue-500 hover:underline hover:text-blue-200">
@@ -145,7 +296,7 @@ function RegisterPage() {
 								回首頁
 							</p>
 						</Link>
-					</p>
+					</div>
 				</div>
 			</div>
 		</>
@@ -171,14 +322,17 @@ function Card({ onClick, img, label }) {
 	);
 }
 
-function InputColumn({ columnName, placeHolder }) {
+function InputColumn({ columnName, placeHolder, value, onChange }) {
 	return (
 		<div>
 			<label className="">{columnName}</label>
 			<input
-				type="text"
-				placeholder={placeHolder}
+				required
 				className="w-full px-3 py-2 border border-gray-300 rounded mb-4 mt-1"
+				type="text"
+				value={value}
+				placeholder={placeHolder}
+				onChange={(e) => onChange(e.target.value)}
 			/>
 		</div>
 	);
