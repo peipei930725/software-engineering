@@ -52,7 +52,7 @@ function Navbar() {
 		return [
 			...commonItems,
 			{ to: "/competition/info", label: "報名參賽" },
-			{ to: "/competition/history", label: "歷屆作品" },
+			{ to: "/projects", label: "歷屆作品" },
 		];
 	};
 

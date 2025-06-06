@@ -76,13 +76,13 @@ export const UserProvider = ({ children }) => {
 
 	// 組件載入時檢查用戶登入狀態
 	useEffect(() => {
-		// fetchUserInfo();
+		fetchUserInfo();
 		// 測試用
-		setUserInfo({
-			isLoggedIn: true,
-			username: '王大明', // 測試用戶名
-			role: 'student' // 測試角色
-		});
+		// setUserInfo({
+		// 	isLoggedIn: true,
+		// 	username: '王大明', // 測試用戶名
+		// 	role: 'student' // 測試角色
+		// });
 	}, []);
 
 	const value = {
