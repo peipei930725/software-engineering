@@ -30,7 +30,6 @@ function Navbar() {
 				{ to: "/editann", label: "公告編輯" },
 				{ to: "", label: "查詢資料" },
 				{ to: "", label: "編輯成員" },
-				{ to: "", label: "指派評審" },
 			],
 			judge: [
 				...commonItems,
