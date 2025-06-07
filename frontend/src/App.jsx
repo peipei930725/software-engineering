@@ -14,6 +14,8 @@ import EditProfilePage from "./pages/EditProfilePage.jsx";
 import ChangePasswordPage from "./pages/ChangePasswordPage.jsx";
 import SubmitPiecePage from "./pages/SubmitPiecePage.jsx";
 import EditAnnouncementPage from "./pages/EditAnnouncementPage.jsx";
+import UsersProfilePage from "./pages/admin/UsersProfilePage.jsx";
+import AdminEditProfilePage from "./pages/admin/AdminEditProfilePage.jsx";
 
 
 // App 主元件
@@ -34,6 +36,8 @@ export default function App() {
 				<Route path="/password" element={<ChangePasswordPage />} />
 				<Route path="/subpiece" element={<SubmitPiecePage />} />
 				<Route path="/editann" element={<EditAnnouncementPage />} />
+				<Route path="/admin/editprofile/:ssn" element={<AdminEditProfilePage />} />
+				<Route path="/allusers" element={<UsersProfilePage/>}/>
 
 				{/* 其他路由(不存在的路由:顯示404 not found) */}
 				<Route path="*" element={<NotFoundPage />} />
