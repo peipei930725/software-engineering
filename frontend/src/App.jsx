@@ -15,7 +15,10 @@ import SubmitPiecePage from "./pages/SubmitPiecePage.jsx";
 import EditAnnouncementPage from "./pages/EditAnnouncementPage.jsx";
 import UsersProfilePage from "./pages/admin/UsersProfilePage.jsx";
 import AdminEditProfilePage from "./pages/admin/AdminEditProfilePage.jsx";
-
+import EditPiecePage from "./pages/EditPiecePage.jsx";
+import TeamInfoPage from "./pages/TeamInfoPage.jsx";
+import GradePage from "./pages/judge/GradePage.jsx";
+import EditGradePage from "./pages/judge/EditGradePage.jsx";
 
 // App 主元件
 export default function App() {
@@ -36,6 +39,10 @@ export default function App() {
 				<Route path="/editann" element={<EditAnnouncementPage />} />
 				<Route path="/admin/editprofile/:ssn" element={<AdminEditProfilePage />} />
 				<Route path="/allusers" element={<UsersProfilePage/>}/>
+				<Route path="/editpiece" element={<EditPiecePage/>}/>
+				<Route path="/teaminfo" element={<TeamInfoPage/>}/>
+				<Route path="/grade" element={<GradePage/>}/>
+				<Route path="/editgrade" element={<EditGradePage/>}/>
 
 				{/* 其他路由(不存在的路由:顯示404 not found) */}
 				<Route path="*" element={<NotFoundPage />} />

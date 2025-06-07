@@ -5,7 +5,7 @@ import { useUser } from "../contexts/UserContext.jsx";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";  
 
-function AnnouncementPage() {
+function EditAnnouncementPage() {
   const { userInfo, isLoadingUser } = useUser();
   const [form, setForm] = useState({
     aid: "",
@@ -343,4 +343,4 @@ function AnnouncementPage() {
   );
 }
 
-export default AnnouncementPage;
+export default EditAnnouncementPage;

@@ -36,13 +36,14 @@ function Navbar() {
 			judge: [
 				...commonItems,
 				{ to: "/projects", label: "歷屆作品" },
-				{ to: "", label: "評審作品" },
-				{ to: "", label: "評分編輯" },
+				{ to: "/grade", label: "評審作品" },
+				{ to: "/editgrade", label: "評分編輯" },
 			],
 			teacher: [
 				...commonItems,
 				{ to: "/projects", label: "歷屆作品" },
 				{ to: "/appeal", label: "申訴系統" },
+				{ to: "", label: "指導隊伍" },
 			],
 		};
 
@@ -97,7 +98,7 @@ function Navbar() {
 				) : isLoggedIn ? (
 					<>
 						{role === "student" && (
-							<Link to="/subpiece" className="flex items-center">
+							<Link to="/teaminfo" className="flex items-center">
 								<p className="text-xl hover:underline cursor-pointer text-white flex items-center">
 									我的隊伍
 								</p>
