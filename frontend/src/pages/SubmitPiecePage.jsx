@@ -1,11 +1,11 @@
-// src/pages/SubmitPiecePage.jsx
 import { useState, useEffect } from "react";
 import { useUser } from "../contexts/UserContext";
 import { useNavigate } from "react-router-dom";
+import Navbar from "../components/Navbar.jsx";
 
 function SubmitPiecePage() {
   const { userInfo } = useUser();
-  const { navigate } = useNavigate();
+  const navigate = useNavigate();
 
   const [form, setForm] = useState({
     tid: "",
@@ -26,7 +26,6 @@ function SubmitPiecePage() {
   }, [userInfo, navigate]);
 
   useEffect(() => {
-    // 若 userInfo.idNumber 存在則使用該值作為 tid，否則從 localStorage 取
     const tid = userInfo?.idNumber || localStorage.getItem("tid") || "T2025001";
     setForm((prev) => ({ ...prev, tid }));
   }, [userInfo]);
@@ -69,47 +68,33 @@ function SubmitPiecePage() {
   };
 
   return (
-    <div className="bg-[#023047] min-h-screen w-screen m-0 flex flex-col items-center justify-center inset-0 overflow-y-auto pb-4 pt-10 relative">
-      <BackButton />
+    <>
+      <Navbar />
+      <div className="bg-[#023047] text-white pt-32 min-h-screen w-screen m-0 flex flex-col items-center justify-center inset-0 overflow-y-auto pb-4 relative">
+        <div className="bg-white text-black rounded-3xl shadow-2xl border border-white/30 p-10 md:p-12 max-w-2xl w-full">
+          <h2 className="text-2xl font-bold mb-8 text-black text-center">作品繳交</h2>
+          <ReminderBlock />
+          <form className="text-black" onSubmit={handleSubmit}>
+            <InputColumn columnName="作品名稱" placeHolder="請輸入作品名稱" name="name" value={form.name} onChange={handleChange} />
+            <InputColumn columnName="Demo 連結" placeHolder="請輸入 demo 網址" name="demo" value={form.demo} onChange={handleChange} />
+            <InputColumn columnName="海報連結" placeHolder="請輸入海報網址（可用雲端連結）" name="poster" value={form.poster} onChange={handleChange} />
+            <InputColumn columnName="程式碼連結" placeHolder="請輸入程式碼網址（如 GitHub）" name="code" value={form.code} onChange={handleChange} />
+            <InputColumn columnName="文件連結" placeHolder="請輸入說明文件網址" name="document" value={form.document} onChange={handleChange} />
 
-      <div className="bg-white text-black rounded-3xl shadow-2xl border border-white/30 p-10 md:p-12 max-w-2xl w-full">
-        <h2 className="text-2xl font-bold mb-8 text-black text-center">作品繳交</h2>
+            <button
+              type="submit"
+              className="w-full mt-8 py-3 bg-green-500 text-white text-lg font-bold rounded-lg shadow-md hover:bg-green-600 hover:shadow-xl transition disabled:opacity-50"
+              disabled={isLoading}
+            >
+              {isLoading ? "送出中..." : "確認繳交"}
+            </button>
 
-        <ReminderBlock />
-
-        <form className="text-black" onSubmit={handleSubmit}>
-          <InputColumn columnName="作品名稱" placeHolder="請輸入作品名稱" name="name" value={form.name} onChange={handleChange} />
-          <InputColumn columnName="Demo 連結" placeHolder="請輸入 demo 網址" name="demo" value={form.demo} onChange={handleChange} />
-          <InputColumn columnName="海報連結" placeHolder="請輸入海報網址（可用雲端連結）" name="poster" value={form.poster} onChange={handleChange} />
-          <InputColumn columnName="程式碼連結" placeHolder="請輸入程式碼網址（如 GitHub）" name="code" value={form.code} onChange={handleChange} />
-          <InputColumn columnName="文件連結" placeHolder="請輸入說明文件網址" name="document" value={form.document} onChange={handleChange} />
-
-          <button
-            type="submit"
-            className="w-full mt-8 py-3 bg-green-500 text-white text-lg font-bold rounded-lg shadow-md hover:bg-green-600 hover:shadow-xl transition disabled:opacity-50"
-            disabled={isLoading}
-          >
-            {isLoading ? "送出中..." : "確認繳交"}
-          </button>
-
-          {error && <div className="mt-4 text-center text-red-500 font-semibold">{error}</div>}
-          {msg && <div className="mt-4 text-center text-green-600 font-semibold">{msg}</div>}
-        </form>
+            {error && <div className="mt-4 text-center text-red-500 font-semibold">{error}</div>}
+            {msg && <div className="mt-4 text-center text-green-600 font-semibold">{msg}</div>}
+          </form>
+        </div>
       </div>
-    </div>
-  );
-}
-
-function BackButton() {
-  return (
-    <button onClick={() => window.history.back()} className="fixed top-8 right-8 z-50 group">
-      <div className="flex items-center px-5 py-2 bg-gradient-to-r from-blue-400 via-pink-400 to-yellow-400 rounded-full shadow-lg hover:scale-110 hover:shadow-2xl transition-transform duration-300 cursor-pointer">
-        <svg className="w-6 h-6 text-white mr-2 group-hover:-translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-        </svg>
-        <span className="font-bold text-white text-base group-hover:text-yellow-200 transition-colors">返回上一頁</span>
-      </div>
-    </button>
+    </>
   );
 }
 
