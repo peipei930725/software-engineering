@@ -84,7 +84,7 @@ function Navbar() {
 				{isLoggedIn ? (
 					<>
 						{role === "student" && (
-							<Link to="/subpiece" className="flex items-center">
+							<Link to="/teaminfo" className="flex items-center">
 								<p className="text-xl hover:underline cursor-pointer text-white flex items-center">
 									我的隊伍
 								</p>
