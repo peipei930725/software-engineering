@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar.jsx";
 import { useUser } from "../contexts/UserContext.jsx";
 
-function AnnouncementPage() {
+function EditAnnouncementPage() {
   const { userInfo } = useUser();
   const [form, setForm] = useState({
     aid: "",
@@ -339,4 +339,4 @@ function AnnouncementPage() {
   );
 }
 
-export default AnnouncementPage;
+export default EditAnnouncementPage;

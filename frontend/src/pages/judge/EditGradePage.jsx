@@ -3,7 +3,7 @@ import { useUser } from "../../contexts/UserContext";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar.jsx";
 
-function JudgeScoreEditPage() {
+function EditGradePage() {
   const { userInfo } = useUser();
   const navigate = useNavigate();
 
@@ -161,4 +161,4 @@ function JudgeScoreEditPage() {
   );
 }
 
-export default JudgeScoreEditPage;
+export default EditGradePage;
