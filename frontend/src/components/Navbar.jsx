@@ -34,13 +34,14 @@ function Navbar() {
 			judge: [
 				...commonItems,
 				{ to: "/projects", label: "歷屆作品" },
-				{ to: "", label: "評審作品" },
-				{ to: "", label: "評分編輯" },
+				{ to: "/grade", label: "評審作品" },
+				{ to: "/editgrade", label: "評分編輯" },
 			],
 			teacher: [
 				...commonItems,
 				{ to: "/projects", label: "歷屆作品" },
 				{ to: "/appeal", label: "申訴系統" },
+				{ to: "", label: "指導隊伍" },
 			],
 		};
 
