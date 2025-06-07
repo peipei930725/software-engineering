@@ -35,22 +35,19 @@ function LoginPage() {
 					password: password,
 				}),
 			});
-
+			console.log(response); // 添加日誌以檢查響應內容
 			const data = await response.json();
+			console.log(data); // 添加日誌以檢查響應內容
+			console.log(data.role);
 
-			if (response.ok && data.success) {
-				// 登入成功後更新用戶狀態
-				if (fetchUserInfo) {
-					// 如果有 fetchUserInfo 函數，使用它來獲取完整的用戶資訊
-					await fetchUserInfo();
-				} else {
+			if (response.ok && (data.message === "登入成功")) {
+				
 					// 或者直接設置從登入 API 返回的用戶資訊
 					setUserInfo({
 						isLoggedIn: true,
-						username: data.username || data.user?.username,
-						role: data.role || data.user?.role
+						username: data.data.name,
+						role: data.data.role
 					});
-				}
 				
 				navigate("/home");
 			} else {
