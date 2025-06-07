@@ -8,5 +8,10 @@
     "ssn": "A123456789",
     "role": "admin",
     "name": "管理員A"
+  },
+  "token-A123456789-admin-1749261239": {
+    "ssn": "A123456789",
+    "role": "admin",
+    "name": "管理員A"
   }
 }
