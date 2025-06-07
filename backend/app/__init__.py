@@ -1,36 +1,43 @@
+import os
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
+from supabase import create_client
 
-db = SQLAlchemy()
+# 初始化 Supabase 客戶端
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 def create_app():
     app = Flask(__name__)
 
-    # 僅允許前端 http://localhost:5173 可以跨域，並且開啟 credentials
+    # CORS 設定：僅允許前端 http://localhost:5173，並支援憑證
     CORS(
         app,
         resources={r"/api/*": {"origins": "http://localhost:5173"}},
         supports_credentials=True
     )
 
+    # 載入其他設定
     app.config.from_object('app.config.Config')
-    db.init_app(app)
 
-    # Register blueprint
-
-    # sample
+    # 註冊各模組 Blueprint
     from .sample.sample import sample_bp
     app.register_blueprint(sample_bp)
+
     from .sample.echo import echo_bp
     app.register_blueprint(echo_bp)
 
-    # auth
     from .auth.auth import auth_api
-    app.register_blueprint(auth_api, url_prefix="/api")
-    
-    # report
-    from .report.report import report_bp
-    app.register_blueprint(report_bp)
+    app.register_blueprint(auth_api, url_prefix='/api')
+
+    from .getdata.projects import projects_bp
+    app.register_blueprint(projects_bp, url_prefix='/api')
+
+    from .getdata.announcement import announcement_bp
+    app.register_blueprint(announcement_bp, url_prefix='/api')
+
+    # 將 supabase 客戶端掛載到 app（若需要 global 存取）
+    app.supabase = supabase
 
     return app
