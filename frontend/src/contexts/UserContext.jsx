@@ -65,7 +65,7 @@ useEffect(() => {
 	// 登出函數
 	const handleLogout = async () => {
 		try {
-			await fetch('/api/auth/logout', {
+			await fetch('http://localhost:5000/api/logout', {
 				method: 'POST',
 				credentials: 'include'
 			});

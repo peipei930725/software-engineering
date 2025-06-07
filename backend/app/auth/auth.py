@@ -4,6 +4,7 @@ from flask import Blueprint, jsonify, request, current_app
 import json
 from datetime import datetime
 from flask import session
+from flask import current_app
 
 auth_api = Blueprint('auth_api', __name__)
 
@@ -114,6 +115,20 @@ def userinfo():
         }), 200
     else:
         return jsonify({'message': '未登入'}), 401
+
+@auth_api.route('/logout', methods=['POST', 'OPTIONS'])
+def logout():
+    if request.method == "OPTIONS":
+        return "", 200
+
+    # 清理整個 session
+    session.clear()
+
+    # 回傳同時清除 session cookie
+    resp = jsonify({"message": "登出成功"})
+    resp.set_cookie(current_app.config.get('SESSION_COOKIE_NAME', 'session'), '', expires=0)
+
+    return resp, 200
 
 
 @auth_api.route('/protected', methods=['GET', 'OPTIONS'])
