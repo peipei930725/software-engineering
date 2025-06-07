@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import Navbar from "../components/Navbar.jsx";
 
 function EditPiecePage() {
-  const { userInfo } = useUser();
+  const { userInfo, isLoadingUser } = useUser();
   const navigate = useNavigate();
   const { pid } = useParams(); // 作品ID從路由取得
 
@@ -22,10 +22,11 @@ function EditPiecePage() {
 
   // 權限檢查
   useEffect(() => {
+    if (isLoadingUser) return;
     if (!userInfo.isLoggedIn || userInfo.role !== "student") {
       navigate("/login");
     }
-  }, [userInfo, navigate]);
+  }, [userInfo, isLoadingUser, navigate]);
 
   // 載入現有作品資料
   useEffect(() => {

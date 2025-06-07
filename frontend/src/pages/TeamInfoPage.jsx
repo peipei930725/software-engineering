@@ -2,12 +2,13 @@ import { useEffect, useState } from "react";
 import { useUser } from "../contexts/UserContext";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar.jsx";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 function TeamInfoPage() {
-  const { userInfo } = useUser();
+  const { userInfo, isLoadingUser } = useUser();
   const navigate = useNavigate();
 
-  // 預設靜態資料
   const staticTeamInfo = {
     tid: 1,
     team_name: "AI創意隊",
@@ -26,6 +27,7 @@ function TeamInfoPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    if (isLoadingUser) return;
     if (!userInfo.isLoggedIn || userInfo.role !== "student") {
       navigate("/login");
       return;
@@ -39,10 +41,12 @@ function TeamInfoPage() {
       })
       .then(setTeamInfo)
       .catch((err) => {
-        setError("後端連線失敗，顯示預設資料");
+        setError(`後端連線失敗，顯示預設資料。${err}`);
         setTeamInfo(staticTeamInfo);
       });
-  }, [userInfo, navigate]);
+  }, [userInfo, isLoadingUser, navigate]);
+
+  const loading = !teamInfo;
 
   return (
     <>
@@ -52,65 +56,78 @@ function TeamInfoPage() {
           <h2 className="text-2xl font-bold mb-8 text-center text-[black] tracking-wider">
             隊伍資訊
           </h2>
+
           {error && (
             <div className="text-yellow-600 text-center font-semibold mb-6">
               {error}
             </div>
           )}
-          {teamInfo && (
-            <>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                <div>
-                  <span className="font-bold text-[black]">隊伍編號：</span>
-                  {teamInfo.tid}
-                </div>
-                <div>
-                  <span className="font-bold text-[black]">隊伍名稱：</span>
-                  {teamInfo.team_name}
-                </div>
-                <div>
-                  <span className="font-bold text-[black]">指導教授：</span>
-                  {teamInfo.teacher_name}
-                </div>
-                <div>
-                  <span className="font-bold text-[black]">年度：</span>
-                  {teamInfo.year}
-                </div>
-                <div>
-                  <span className="font-bold text-[black]">排名：</span>
-                  {teamInfo.rank}
-                </div>
-                {teamInfo.students && teamInfo.students.slice(0, 6).map((stu, i) => (
-                  <div key={i} className="col-span-1">
-                    <span className="font-bold text-[black]">學生{i + 1}：</span>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div>
+            <div className="mb-3">
+              <span className="font-bold text-[black]">隊伍編號：</span>
+              {loading ? <Skeleton width={100} baseColor="#d9e3ec" highlightColor="#f0f4f8"/> : teamInfo.tid}
+            </div>
+            <div className="mb-3">
+              <span className="font-bold text-[black]">隊伍名稱：</span>
+              {loading ? <Skeleton width={120} baseColor="#d9e3ec" highlightColor="#f0f4f8"/> : teamInfo.team_name}
+            </div>
+            <div className="mb-3">
+              <span className="font-bold text-[black]">指導教授：</span>
+              {loading ? <Skeleton width={100} baseColor="#d9e3ec" highlightColor="#f0f4f8"/> : teamInfo.teacher_name}
+            </div>
+            <div className="mb-3">
+              <span className="font-bold text-[black]">年度：</span>
+              {loading ? <Skeleton width={80} baseColor="#d9e3ec" highlightColor="#f0f4f8"/> : teamInfo.year}
+            </div>
+            <div className="mb-3 ">
+              <span className="font-bold text-[black]">排名：</span>
+              {loading ? <Skeleton width={40} baseColor="#d9e3ec" highlightColor="#f0f4f8"/> : teamInfo.rank}
+            </div>
+          </div>
+            
+          <div>
+            {(loading ? Array(4).fill(null) : teamInfo.students).map((stu, i) => (
+              <div key={i} className="col-span-1">
+                <span className="font-bold text-[black]">學生{i + 1}：</span>
+                {loading ? (
+                  <Skeleton width={`80%`} baseColor="#d9e3ec" highlightColor="#f0f4f8"/>
+                ) : (
+                  <>
+                    <br />
                     {stu.name}（{stu.sid}） / {stu.department} / {stu.grade}年級
-                  </div>
-                ))}
+                  </>
+                )}
               </div>
-              <div className="mb-8 border-t border-[black] pt-6">
-                <h3 className="text-xl font-bold mb-4 text-[black]">功能選單</h3>
-                <div className="flex flex-wrap gap-4">
-                  <button
-                    onClick={() => navigate("/editinfo")}
-                    className="px-6 py-2 bg-[black] text-white rounded-lg font-bold hover:bg-[#126782] transition"
-                  >
-                    修改隊伍資料
-                  </button>
-                  <button
-                    onClick={() => navigate("/subpiece")}
-                    className="px-6 py-2 bg-[black] text-white rounded-lg font-bold hover:bg-[#126782] transition"
-                  >
-                    上傳作品
-                  </button>
-                  <button
-                    onClick={() => navigate("/editpiece")}
-                    className="px-6 py-2 bg-[black] text-white rounded-lg font-bold hover:bg-[#126782] transition"
-                  >
-                    修改作品
-                  </button>
-                </div>
+            ))}
+            </div>
+          </div>
+
+          {!loading && (
+            <div className="mb-8 border-t border-[black] pt-6">
+              <h3 className="text-xl font-bold mb-4 text-[black]">功能選單</h3>
+              <div className="flex flex-wrap gap-4">
+                <button
+                  onClick={() => navigate("/editinfo")}
+                  className="px-6 py-2 bg-[black] text-white rounded-lg font-bold hover:bg-[#126782] transition"
+                >
+                  修改隊伍資料
+                </button>
+                <button
+                  onClick={() => navigate("/subpiece")}
+                  className="px-6 py-2 bg-[black] text-white rounded-lg font-bold hover:bg-[#126782] transition"
+                >
+                  上傳作品
+                </button>
+                <button
+                  onClick={() => navigate("/editpiece")}
+                  className="px-6 py-2 bg-[black] text-white rounded-lg font-bold hover:bg-[#126782] transition"
+                >
+                  修改作品
+                </button>
               </div>
-            </>
+            </div>
           )}
         </div>
       </div>

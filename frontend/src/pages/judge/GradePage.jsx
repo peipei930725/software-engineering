@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar.jsx";
 
 function GradePage() {
-  const { userInfo } = useUser();
+  const { userInfo, isLoadingUser } = useUser();
   const navigate = useNavigate();
 
   const [pieces, setPieces] = useState([]);
@@ -16,6 +16,7 @@ function GradePage() {
 
   // 取得今年所有可評分作品
   useEffect(() => {
+    if (isLoadingUser) return;
     if (!userInfo.isLoggedIn || userInfo.role !== "judge") {
       navigate("/login");
       return;
@@ -27,7 +28,7 @@ function GradePage() {
       })
       .then(setPieces)
       .catch(() => setStatus("無法取得作品資料，請稍後再試"));
-  }, [userInfo, navigate]);
+  }, [userInfo, isLoadingUser, navigate]);
 
   // 送出評分
   const handleSubmit = (e) => {

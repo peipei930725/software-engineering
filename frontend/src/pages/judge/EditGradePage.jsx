@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar.jsx";
 
 function EditGradePage() {
-  const { userInfo } = useUser();
+  const { userInfo, isLoadingUser } = useUser();
   const navigate = useNavigate();
 
   const [submittedScores, setSubmittedScores] = useState([]);
@@ -16,6 +16,7 @@ function EditGradePage() {
 
   // 取得已送出評分
   useEffect(() => {
+    if (isLoadingUser) return;
     if (!userInfo.isLoggedIn || userInfo.role !== "judge") {
       navigate("/login");
       return;
@@ -27,7 +28,7 @@ function EditGradePage() {
       })
       .then(setSubmittedScores)
       .catch(() => setStatus("無法取得評分資料，請稍後再試"));
-  }, [userInfo, navigate]);
+  }, [userInfo, isLoadingUser, navigate]);
 
   // 點選編輯
   const handleEdit = (scoreObj) => {

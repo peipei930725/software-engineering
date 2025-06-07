@@ -38,7 +38,7 @@ function AdminEditProfilePage() {
 	}, [userInfo, isLoadingUser]);
 
 	useEffect(() => {
-		fetch(`/api/profile?ssn=${ssn}`, {
+		fetch(`/api/profile/${ssn}`, {
 			credentials: "include",
 		})
 			.then((res) => res.json())

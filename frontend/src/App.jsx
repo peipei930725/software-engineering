@@ -26,26 +26,32 @@ export default function App() {
 		<UserProvider>
 			<Routes>
 				<Route path="/" element={<Navigate to="/home" replace />} />
-				<Route path="/testback" element={<TestBack />} />
 				<Route path="/home" element={<HomePage />} />
 				<Route path="/login" element={<LoginPage />} />
 				<Route path="/register" element={<RegisterPage />} />
-				<Route path="/projects" element={<BrowseProjectPage />} />
-				<Route path="/teamreg" element={<TeamRegisterPage />} />
-				<Route path="/info" element={<InfoPage />} />
-				<Route path="/appeal" element={<AppealPage />} />
 				<Route path="/editpro" element={<EditProfilePage />} />
-				<Route path="/subpiece" element={<SubmitPiecePage />} />
+				<Route path="/appeal" element={<AppealPage />} />
+				{/* 無權限路由 */}
+				<Route path="/projects" element={<BrowseProjectPage />} />
+				<Route path="/info" element={<InfoPage />} />
+				{/* 管理員路由 */}
 				<Route path="/editann" element={<EditAnnouncementPage />} />
 				<Route path="/admin/editprofile/:ssn" element={<AdminEditProfilePage />} />
 				<Route path="/allusers" element={<UsersProfilePage/>}/>
-				<Route path="/editpiece" element={<EditPiecePage/>}/>
-				<Route path="/teaminfo" element={<TeamInfoPage/>}/>
+				{/* 評審路由 */}
 				<Route path="/grade" element={<GradePage/>}/>
 				<Route path="/editgrade" element={<EditGradePage/>}/>
+				{/* 學生路由 */}
+				<Route path="/editpiece" element={<EditPiecePage/>}/>
+				<Route path="/teamreg" element={<TeamRegisterPage />} />
+				<Route path="/subpiece" element={<SubmitPiecePage />} />
+				<Route path="/teaminfo" element={<TeamInfoPage/>}/>
+				{/* 指導老師路由 */}
 
 				{/* 其他路由(不存在的路由:顯示404 not found) */}
 				<Route path="*" element={<NotFoundPage />} />
+
+				<Route path="/testback" element={<TestBack />} />
 			</Routes>
 		</UserProvider>
 	);
