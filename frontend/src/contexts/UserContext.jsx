@@ -22,40 +22,45 @@ export const UserProvider = ({ children }) => {
 	});
 
 	// 從後端獲取用戶資訊的函數
-	const fetchUserInfo = async () => {
-		// try {
-		// 	const response = await fetch('/api/user/info', {
-		// 		method: 'GET',
-		// 		credentials: 'include', // 包含 cookies
-		// 		headers: {
-		// 			'Content-Type': 'application/json',
-		// 		}
-		// 	});
+const fetchUserInfo = async () => {
+    try {
+        const response = await fetch('http://localhost:5000/api/userinfo', {
+            method: 'GET',
+            credentials: 'include', // 包含 cookies
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
 
-		// 	if (response.ok) {
-		// 		const data = await response.json();
-		// 		setUserInfo({
-		// 			isLoggedIn: true,
-		// 			username: data.username,
-		// 			role: data.role
-		// 		});
-		// 	} else {
-		// 		// 用戶未登入或 token 無效
-		// 		setUserInfo({
-		// 			isLoggedIn: false,
-		// 			username: '',
-		// 			role: ''
-		// 		});
-		// 	}
-		// } catch (error) {
-		// 	console.error('獲取用戶資訊失敗:', error);
-		// 	setUserInfo({
-		// 		isLoggedIn: false,
-		// 		username: '',
-		// 		role: ''
-		// 	});
-		// }
-	};
+        if (response.ok) {
+            const data = await response.json();
+            setUserInfo({
+                isLoggedIn: true,
+                username: data.username,
+                role: data.role
+            });
+        } else {
+            // 用戶未登入或 token 無效
+            setUserInfo({
+                isLoggedIn: false,
+                username: '',
+                role: ''
+            });
+        }
+    } catch (error) {
+        console.error('獲取用戶資訊失敗:', error);
+        setUserInfo({
+            isLoggedIn: false,
+            username: '',
+            role: ''
+        });
+    }
+};
+
+// App 初始化時自動檢查登入狀態 ✅✅✅
+useEffect(() => {
+    fetchUserInfo();
+}, []);
 
 	// 登出函數
 	const handleLogout = async () => {

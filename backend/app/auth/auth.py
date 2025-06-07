@@ -3,6 +3,7 @@
 from flask import Blueprint, jsonify, request, current_app
 import json
 from datetime import datetime
+from flask import session
 
 auth_api = Blueprint('auth_api', __name__)
 
@@ -81,6 +82,10 @@ def login():
     }
     save_tokens(valid_tokens)
 
+    session['user_id'] = ssn
+    session['username'] = name
+    session['role'] = role
+
     return jsonify({
         "message": "登入成功",
         "data": {
@@ -90,6 +95,26 @@ def login():
             "ssn": ssn
         }
     }), 200
+
+@auth_api.route('/userinfo', methods=['GET', 'OPTIONS'])
+def userinfo():
+    # 處理預檢請求
+    if request.method == 'OPTIONS':
+        response = jsonify({'message': 'OK'})
+        response.status_code = 200
+        return response
+
+    # 處理 GET → 用 session 判斷
+    if 'user_id' in session:
+        username = session.get('username', '未知用戶')
+        role = session.get('role', 'unknown')
+        return jsonify({
+            'username': username,
+            'role': role
+        }), 200
+    else:
+        return jsonify({'message': '未登入'}), 401
+
 
 @auth_api.route('/protected', methods=['GET', 'OPTIONS'])
 def protected_route():

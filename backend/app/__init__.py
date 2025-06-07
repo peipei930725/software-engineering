@@ -11,6 +11,8 @@ supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 def create_app():
     app = Flask(__name__)
 
+    app.config['SECRET_KEY'] = 'KEY123456789'
+
     # CORS 設定：僅允許前端 http://localhost:5173，並支援憑證
     CORS(
         app,
