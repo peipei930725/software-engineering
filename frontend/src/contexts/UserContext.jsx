@@ -18,8 +18,7 @@ export const UserProvider = ({ children }) => {
 	const [userInfo, setUserInfo] = useState({
 		isLoggedIn: false,
 		username: '',
-		role: '', // 'student', 'admin', 'judge', 'teacher'
-		idNumber: '' // 身分證字號/SSD/ID_Num
+		role: '' // 'student', 'admin', 'judge', 'teacher'
 	});
 
 	// 從後端獲取用戶資訊的函數
@@ -38,16 +37,14 @@ export const UserProvider = ({ children }) => {
 				setUserInfo({
 					isLoggedIn: true,
 					username: data.username,
-					role: data.role,
-					idNumber: data.idNumber, // 假設後端返回 idNumber
+					role: data.role
 				});
 			} else {
 				// 用戶未登入或 token 無效
 				setUserInfo({
 					isLoggedIn: false,
 					username: '',
-					role: '',
-					idNumber: ''
+					role: ''
 				});
 			}
 		} catch (error) {
@@ -55,8 +52,7 @@ export const UserProvider = ({ children }) => {
 			setUserInfo({
 				isLoggedIn: false,
 				username: '',
-				role: '',
-				idNumber: ''
+				role: ''
 			});
 		}
 	};
@@ -71,8 +67,7 @@ export const UserProvider = ({ children }) => {
 			setUserInfo({
 				isLoggedIn: false,
 				username: '',
-				role: '',
-				idNumber: ''
+				role: ''
 			});
 		} catch (error) {
 			console.error('登出失敗:', error);
@@ -81,14 +76,13 @@ export const UserProvider = ({ children }) => {
 
 	// 組件載入時檢查用戶登入狀態
 	useEffect(() => {
-		fetchUserInfo();
+		//fetchUserInfo();
 		// 測試用
-		// setUserInfo({
-		// 	isLoggedIn: true,
-		// 	username: '王大明', // 測試用戶名
-		// 	role: 'student', // 測試角色
-		// 	idNumber: 'A123456789' // 測試身分證字號
-		// });
+		 setUserInfo({
+			isLoggedIn: true,
+		 	username: '王大明', // 測試用戶名
+		 	role: 'admin' // 測試角色
+		 });
 	}, []);
 
 	const value = {
