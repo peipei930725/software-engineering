@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar.jsx";
 
 function SubmitPiecePage() {
-  const { userInfo } = useUser();
+  const { userInfo, isLoadingUser } = useUser();
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
@@ -20,10 +20,11 @@ function SubmitPiecePage() {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    if (isLoadingUser) return;
     if (!userInfo.isLoggedIn || userInfo.role !== "student") {
       navigate("/login");
     }
-  }, [userInfo, navigate]);
+  }, [userInfo, isLoadingUser,navigate]);
 
   useEffect(() => {
     const tid = userInfo?.idNumber || localStorage.getItem("tid") || "T2025001";

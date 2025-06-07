@@ -1,11 +1,10 @@
 import Navbar from "../components/Navbar.jsx";
 import Announcement from "../components/Announcement.jsx";
-import { useUser } from "../contexts/UserContext.jsx";
 
+import Skeleton from 'react-loading-skeleton'
+import 'react-loading-skeleton/dist/skeleton.css'
 
 function HomePage() {
-	const { userInfo } = useUser();
-	console.log(userInfo);
 	return (
 		<>
 			<Navbar />

@@ -2,9 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar.jsx";
 import { useUser } from "../contexts/UserContext.jsx";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";  
 
 function AnnouncementPage() {
-  const { userInfo } = useUser();
+  const { userInfo, isLoadingUser } = useUser();
   const [form, setForm] = useState({
     aid: "",
     title: "",
@@ -17,12 +19,14 @@ function AnnouncementPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
+
   useEffect(() => {
+    if (isLoadingUser) return;
 		if (!userInfo.isLoggedIn || userInfo.role !== "admin") {
 			// 有登入 而且 是管理員  => 沒登入 或 不是管理員
 			navigate("/login");
 		}
-  }, [userInfo, navigate]);
+  }, [userInfo, isLoadingUser]);
 
   // 預設自動填入現在時間
   // 編輯模式狀態
@@ -90,7 +94,7 @@ function AnnouncementPage() {
           title: form.title,
           context: form.context,
           datetime: form.datetime,
-          admin_ssn: userInfo.username,
+          admin_ssn: userInfo.ssn,
         }),
       });
       const data = await res.json();

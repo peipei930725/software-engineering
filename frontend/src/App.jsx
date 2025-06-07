@@ -11,7 +11,6 @@ import TeamRegisterPage from "./pages/TeamRegisterPage.jsx";
 import InfoPage from "./pages/InfoPage.jsx";
 import AppealPage from "./pages/AppealPage.jsx";
 import EditProfilePage from "./pages/EditProfilePage.jsx";
-import ChangePasswordPage from "./pages/ChangePasswordPage.jsx";
 import SubmitPiecePage from "./pages/SubmitPiecePage.jsx";
 import EditAnnouncementPage from "./pages/EditAnnouncementPage.jsx";
 import UsersProfilePage from "./pages/admin/UsersProfilePage.jsx";
@@ -33,7 +32,6 @@ export default function App() {
 				<Route path="/info" element={<InfoPage />} />
 				<Route path="/appeal" element={<AppealPage />} />
 				<Route path="/editpro" element={<EditProfilePage />} />
-				<Route path="/password" element={<ChangePasswordPage />} />
 				<Route path="/subpiece" element={<SubmitPiecePage />} />
 				<Route path="/editann" element={<EditAnnouncementPage />} />
 				<Route path="/admin/editprofile/:ssn" element={<AdminEditProfilePage />} />

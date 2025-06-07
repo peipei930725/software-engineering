@@ -18,8 +18,11 @@ export const UserProvider = ({ children }) => {
 	const [userInfo, setUserInfo] = useState({
 		isLoggedIn: false,
 		username: '',
-		role: '' // 'student', 'admin', 'judge', 'teacher'
+		role: '', // 'student', 'admin', 'judge', 'teacher'
+		ssn: ''
 	});
+
+	const [isLoadingUser, setIsLoadingUser] = useState(true); // 用於指示是否正在加載用戶資訊
 
 	// 從後端獲取用戶資訊的函數
 const fetchUserInfo = async () => {
@@ -37,24 +40,29 @@ const fetchUserInfo = async () => {
             setUserInfo({
                 isLoggedIn: true,
                 username: data.username,
-                role: data.role
+                role: data.role,
+				ssn: data.ssn
             });
         } else {
             // 用戶未登入或 token 無效
             setUserInfo({
                 isLoggedIn: false,
                 username: '',
-                role: ''
+                role: '',
+                ssn: ''
             });
-        }
+        } 
     } catch (error) {
         console.error('獲取用戶資訊失敗:', error);
         setUserInfo({
             isLoggedIn: false,
             username: '',
-            role: ''
+            role: '',
+			ssn: ''
         });
-    }
+    } finally {
+		setIsLoadingUser(false); // 無論成功或失敗，都設置為已加載
+	}
 };
 
 // App 初始化時自動檢查登入狀態 ✅✅✅
@@ -72,26 +80,17 @@ useEffect(() => {
 			setUserInfo({
 				isLoggedIn: false,
 				username: '',
-				role: ''
+				role: '',
+				ssn: ''
 			});
 		} catch (error) {
 			console.error('登出失敗:', error);
 		}
 	};
 
-	// 組件載入時檢查用戶登入狀態
-	// useEffect(() => {
-	// 	fetchUserInfo();
-	// 	// 測試用
-	// 	// setUserInfo({
-	// 	// 	isLoggedIn: true,
-	// 	//  	username: '王大明', // 測試用戶名
-	// 	//  	role: 'admin' // 測試角色
-	// 	// });
-	// }, []);
-
 	const value = {
 		userInfo,
+		isLoadingUser, // 給外部使用
 		fetchUserInfo,
 		handleLogout,
 		setUserInfo // 如果需要直接設置用戶資訊

@@ -1,13 +1,28 @@
 // src/pages/AdminEditProfilePage.jsx
 import { useEffect, useState } from "react";
-import { useParams, useLocation, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar";
+import { useUser } from "../../contexts/UserContext";
+
+/* GOT JSON (* 根據不同身分有不同欄位)
+{
+	address: "高雄",
+	*department: "資工系",
+	email: "123@gmail",
+	*grade: "3",
+	idNumber: "A123456789",
+	name: "王大明",
+	password: "password123",
+	phone: "0912345678",
+	role: "student",
+	*studentId: "A1115521"
+}
+*/
 
 function AdminEditProfilePage() {
 	const { ssn } = useParams();
-	const location = useLocation();
 	const navigate = useNavigate();
-	const identity = new URLSearchParams(location.search).get("identity");
+	const { userInfo, isLoadingUser } = useUser();
 
 	const [profile, setProfile] = useState(null);
 	const [error, setError] = useState("");
@@ -16,7 +31,14 @@ function AdminEditProfilePage() {
 	const [newPassword, setNewPassword] = useState("");
 
 	useEffect(() => {
-		fetch(`/api/profile?ssn=${ssn}&identity=${identity}`, {
+		if (isLoadingUser) return;
+		if (!userInfo.isLoggedIn || userInfo.role !== "admin") {
+			navigate("/login");
+		}
+	}, [userInfo, isLoadingUser]);
+
+	useEffect(() => {
+		fetch(`/api/profile?ssn=${ssn}`, {
 			credentials: "include",
 		})
 			.then((res) => res.json())
@@ -25,7 +47,7 @@ function AdminEditProfilePage() {
 				console.error(err);
 				setError("無法載入使用者資料");
 			});
-	}, [ssn, identity]);
+	}, [ssn]);
 
 	const handleChange = (e) => {
 		setProfile({ ...profile, [e.target.name]: e.target.value });
@@ -38,7 +60,7 @@ function AdminEditProfilePage() {
 		setMsg("");
 
 		try {
-			const body = { ...profile, identity };
+			const body = { ...profile };
 			if (newPassword) body.new_password = newPassword;
 
 			const res = await fetch("/api/admin/user", {
@@ -82,6 +104,8 @@ function AdminEditProfilePage() {
 		);
 	}
 
+	const { role } = profile;
+
 	return (
 		<>
 			<Navbar />
@@ -91,68 +115,23 @@ function AdminEditProfilePage() {
 						修改使用者資料
 					</h2>
 					<form onSubmit={handleSubmit}>
-						<InputColumn
-							label="姓名"
-							name="name"
-							value={profile.name}
-							onChange={handleChange}
-						/>
-						<InputColumn
-							label="Email"
-							name="email"
-							value={profile.email}
-							onChange={handleChange}
-						/>
-						<InputColumn
-							label="手機號碼"
-							name="phonenumber"
-							value={profile.phonenumber}
-							onChange={handleChange}
-						/>
-						<InputColumn
-							label="聯絡地址"
-							name="address"
-							value={profile.address}
-							onChange={handleChange}
-						/>
+						<InputColumn label="姓名" name="name" value={profile.name} onChange={handleChange} />
+						<InputColumn label="Email" name="email" value={profile.email} onChange={handleChange} />
+						<InputColumn label="手機號碼" name="phonenumber" value={profile.phonenumber} onChange={handleChange} />
+						<InputColumn label="聯絡地址" name="address" value={profile.address} onChange={handleChange} />
 
-						{identity === "student" && (
+						{role === "student" && (
 							<>
-								<InputColumn
-									label="系所"
-									name="department"
-									value={profile.department}
-									onChange={handleChange}
-								/>
-								<InputColumn
-									label="年級"
-									name="grade"
-									value={profile.grade}
-									onChange={handleChange}
-								/>
-								<InputColumn
-									label="學號"
-									name="sid"
-									value={profile.sid}
-									onChange={handleChange}
-								/>
+								<InputColumn label="系所" name="department" value={profile.department} onChange={handleChange} />
+								<InputColumn label="年級" name="grade" value={profile.grade} onChange={handleChange} />
+								<InputColumn label="學號" name="sid" value={profile.sid} onChange={handleChange} />
 							</>
 						)}
-						{identity === "teacher" && (
-							<InputColumn
-								label="學歷"
-								name="degree"
-								value={profile.degree}
-								onChange={handleChange}
-							/>
+						{role === "teacher" && (
+							<InputColumn label="學歷" name="degree" value={profile.degree} onChange={handleChange} />
 						)}
-						{identity === "judge" && (
-							<InputColumn
-								label="頭銜"
-								name="title"
-								value={profile.title}
-								onChange={handleChange}
-							/>
+						{role === "judge" && (
+							<InputColumn label="頭銜" name="title" value={profile.title} onChange={handleChange} />
 						)}
 
 						<hr className="my-10 border-t-2 border-gray-200" />
@@ -160,9 +139,7 @@ function AdminEditProfilePage() {
 							密碼重設（可選填）
 						</h3>
 						<div className="mb-4">
-							<label className="block mb-1 font-medium">
-								新密碼
-							</label>
+							<label className="block mb-1 font-medium">新密碼</label>
 							<input
 								type="password"
 								name="new-password"

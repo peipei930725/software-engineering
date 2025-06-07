@@ -18,13 +18,15 @@ function TeamRegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const { userInfo } = useUser();
+  const { userInfo, isLoadingUser } = useUser();
   useEffect(() => {
+    if (isLoadingUser) return;
 		if (!userInfo.isLoggedIn || userInfo.role !== "student") {
 			// 有登入 而且 是學收  => 沒登入 或 不是學生
 			navigate("/login");
 		}
-  }, [userInfo, navigate]);
+    setForm({ ...form, student1_id: userInfo.ssn }); // 預設學生1的身分證字號為當前用戶的身分證字號，這欄不套用onchange，所以在渲染時執行一次
+  }, [userInfo, isLoadingUser, navigate]);
 
   // 表單變更處理
   const handleChange = (e) => {
@@ -53,6 +55,7 @@ function TeamRegisterPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
+      console.log(res);
       const data = await res.json();
       if (res.ok && data.success) {
         setMsg(data.msg || "隊伍註冊成功！");
@@ -75,9 +78,6 @@ function TeamRegisterPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* 重要提醒 */}
           <div>
-            <div className="text-2xl font-semibold text-red-600 mb-2">
-              重要：自己的身分證字號也需填入！
-            </div>
             <div className="text-base text-gray-700 mb-2">
               有標註 <span className="text-red-600">*</span> 的欄位為必填！
             </div>
@@ -92,7 +92,7 @@ function TeamRegisterPage() {
           <InputColumn
             label="學生1的身分證字號"
             name="student1_id"
-            value={userInfo.idNumber}
+            value={userInfo.ssn}
             required
             disabled
           />

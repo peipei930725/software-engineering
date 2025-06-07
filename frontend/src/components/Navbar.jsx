@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
 import { useUser } from "../contexts/UserContext";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 function getRoleDisplayName(role) {
 	const roleNames = {
@@ -12,7 +14,7 @@ function getRoleDisplayName(role) {
 }
 
 function Navbar() {
-	const { userInfo, handleLogout } = useUser();
+	const { userInfo, handleLogout, isLoadingUser } = useUser();
 	const { isLoggedIn, username, role } = userInfo;
 
 	const getMenuItems = () => {
@@ -67,21 +69,32 @@ function Navbar() {
 					</div>
 				</Link>
 				<ul className="flex space-x-6 text-xl">
-					{menuItems.map((item, index) => (
-						<>
-							<Link key={index} to={item.to}>
-								<li className="hover:underline text-white">
-									{item.label}
+					{isLoadingUser
+						? [...Array(3)].map((_, idx) => (
+								<li key={idx}>
+									<Skeleton
+										width={80}
+										height={24}
+										baseColor="#294b63"
+										highlightColor="#396d8a"
+									/>
 								</li>
-							</Link>
-						</>
-					))}
+						  ))
+						: menuItems.map((item, index) => (
+								<Link key={index} to={item.to}>
+									<li className="hover:underline text-white">
+										{item.label}
+									</li>
+								</Link>
+						  ))}
 				</ul>
 			</div>
 
 			{/* 右側: 登入或使用者 */}
 			<div className="flex space-x-4 text-sm">
-				{isLoggedIn ? (
+				{isLoadingUser ? (
+					<Skeleton width={150} height={24} baseColor="#294b63" highlightColor="#396d8a" />
+				) : isLoggedIn ? (
 					<>
 						{role === "student" && (
 							<Link to="/subpiece" className="flex items-center">
@@ -97,10 +110,7 @@ function Navbar() {
 						<Link to="/editpro">
 							<button className="text-white">修改資料</button>
 						</Link>
-						<button
-							className="hover:underline"
-							onClick={handleLogout}
-						>
+						<button className="hover:underline" onClick={handleLogout}>
 							登出
 						</button>
 					</>

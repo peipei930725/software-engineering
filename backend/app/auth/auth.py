@@ -109,9 +109,11 @@ def userinfo():
     if 'user_id' in session:
         username = session.get('username', '未知用戶')
         role = session.get('role', 'unknown')
+        ssn = session.get('user_id', '未知 SSN')
         return jsonify({
             'username': username,
-            'role': role
+            'role': role,
+            'ssn': ssn
         }), 200
     else:
         return jsonify({'message': '未登入'}), 401

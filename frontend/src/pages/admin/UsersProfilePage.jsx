@@ -13,17 +13,18 @@ const fieldNameToLabel = {
 };
 
 function UsersProfilePage() {
-	const { userInfo } = useUser();
+	const { userInfo, isLoadingUser } = useUser();
 	const navigate = useNavigate();
 	const [identity, setIdentity] = useState("student");
 	const [data, setData] = useState([]);
 	const [columns, setColumns] = useState([]);
 
 	useEffect(() => {
+		if (isLoadingUser) return;
 		if (!userInfo.isLoggedIn || userInfo.role !== "admin") {
 			navigate("/login");
 		}
-	}, [userInfo]);
+	}, [userInfo, isLoadingUser]);
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -49,40 +50,6 @@ function UsersProfilePage() {
 		};
 		fetchData();
 	}, [identity]);
-
-	// // 假資料 模擬用 請註解掉 !
-	// useEffect(() => {
-	// 	const mock = {
-	// 		student: [
-	// 			{
-	// 				ssn: "A123456789",
-	// 				username: "王小明",
-	// 				email: "student1@example.com",
-	// 				department: "資訊工程學系",
-	// 				grade: "大三",
-	// 				phone: "0912345678",
-	// 			},
-	// 		],
-	// 		teacher: [
-	// 			{
-	// 				ssn: "T111222333",
-	// 				username: "陳老師",
-	// 				email: "teacher1@example.com",
-	// 				department: "數學系",
-	// 				title: "副教授",
-	// 			},
-	// 		],
-	// 		// 其他角色...
-	// 	};
-
-	// 	console.log("API 回傳結果：", mock[identity]);
-	// 	setData(mock[identity]);
-	// 	if (mock[identity].length > 0) {
-	// 		setColumns(Object.keys(mock[identity][0]));
-	// 	} else {
-	// 		setColumns([]);
-	// 	}	
-	// }, [identity]);
 
 	return (
 		<>

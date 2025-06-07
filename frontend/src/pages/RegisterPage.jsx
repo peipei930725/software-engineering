@@ -108,7 +108,7 @@ function RegisterPage() {
 				window.alert("註冊成功，請登入");
 				window.location.href = "/home";
 			} else {
-				setMessage(`註冊失敗： ${data.message || "請稍後再試"}}`);
+				setMessage(`註冊失敗： ${data.message || "請稍後再試"}`);
 			}
 		} catch (err) {
 			console.error(err);

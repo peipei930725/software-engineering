@@ -10,17 +10,18 @@ function AppealPage() {
 	});
 	const [message, setMessage] = useState("");
 
-	const { userInfo } = useUser();
+	const { userInfo, isLoadingUser } = useUser();
 	const navigate = useNavigate();
 
 	// 檢查使用者是否已登入且角色為學生或老師
 	// 如果沒有登入或不是學生或老師，則重定向到登入頁面
 	useEffect(() => {
+		if (isLoadingUser) return; // 等待使用者資訊載入完成
 		if (!userInfo.isLoggedIn || !(userInfo.role === "student" || userInfo.role === "teacher")) {
 			// 有登入 而且 是老師或學生  => 沒登入 或 不是(老師或學生)
 			navigate("/login");
 		}  
-	}, [userInfo, navigate]);
+	}, [userInfo, isLoadingUser, navigate]);
 
 	const handleChange = (e) => {
 		setForm({ ...form, [e.target.name]: e.target.value });

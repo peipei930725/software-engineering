@@ -16,7 +16,7 @@ const STATIC_PROFILE = {
 };
 
 function EditProfilePage() {
-  const { userInfo } = useUser();
+  const { userInfo, isLoadingUser } = useUser();
   const [profile, setProfile] = useState(null);
   const [msg, setMsg] = useState("");
   const [error, setError] = useState("");
@@ -28,16 +28,13 @@ function EditProfilePage() {
   const [newPassword, setNewPassword] = useState("");
 
   useEffect(() => {
-    if (!userInfo.isLoggedIn) {
+    if (isLoadingUser) return;
+    if (!userInfo.isLoggedIn || !userInfo.username) {
       navigate("/login");
     }
-  }, [userInfo, navigate]);
+  }, [userInfo, isLoadingUser, navigate]);
 
   useEffect(() => {
-    if (!userInfo.isLoggedIn || !userInfo.username) {
-      setError("未登入或找不到用戶資訊");
-      return;
-    }
     fetch(`/api/profile?ssn=${encodeURIComponent(userInfo.username)}`, {
       credentials: 'include'
     })
@@ -285,19 +282,23 @@ function EditProfilePage() {
 }
 
 // 可重用的輸入欄位元件
-function InputColumn({ columnName, placeHolder, name, value, onChange }) {
+function InputColumn({ columnName, placeHolder, name, value, onChange, loading }) {
   return (
     <div>
       <label className="">{columnName}</label>
-      <input
-        type="text"
-        name={name}
-        value={value || ""}
-        onChange={onChange}
-        placeholder={placeHolder}
-        className="w-full px-3 py-2 border border-gray-300 rounded mb-4 mt-1"
-        required
-      />
+      {loading ? (
+        <Skeleton height={40} className="mb-4 mt-1" />
+      ) : (
+        <input
+          type="text"
+          name={name}
+          value={value || ""}
+          onChange={onChange}
+          placeholder={placeHolder}
+          className="w-full px-3 py-2 border border-gray-300 rounded mb-4 mt-1"
+          required
+        />
+      )}
     </div>
   );
 }
