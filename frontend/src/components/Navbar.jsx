@@ -28,7 +28,7 @@ function Navbar() {
 				{ to: "/appeal", label: "申訴系統" },
 			],
 			admin: [
-				{ to: "", label: "申訴接收" },
+				{ to: "/adminappeal", label: "申訴接收" },
 				{ to: "/editann", label: "公告編輯" },
 				{ to: "", label: "查詢資料" },
 				{ to: "/allusers", label: "編輯成員" },

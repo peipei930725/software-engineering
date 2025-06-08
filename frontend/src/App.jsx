@@ -20,6 +20,7 @@ import TeamInfoPage from "./pages/TeamInfoPage.jsx";
 import GradePage from "./pages/judge/GradePage.jsx";
 import EditGradePage from "./pages/judge/EditGradePage.jsx";
 import GuideTeamPage from "./pages/teacher/GuideTeamPage.jsx";
+import AdminAppealPage from "./pages/admin/AdminAppealPage.jsx";
 
 // App 主元件
 export default function App() {
@@ -39,6 +40,7 @@ export default function App() {
 				<Route path="/editann" element={<EditAnnouncementPage />} />
 				<Route path="/admin/editprofile/:ssn" element={<AdminEditProfilePage />} />
 				<Route path="/allusers" element={<UsersProfilePage/>}/>
+				<Route path="/adminappeal" element={<AdminAppealPage/>}/>
 				{/* 評審路由 */}
 				<Route path="/grade" element={<GradePage/>}/>
 				<Route path="/editgrade" element={<EditGradePage/>}/>
