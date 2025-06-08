@@ -1,23 +1,8 @@
 // src/pages/AdminEditProfilePage.jsx
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 import { useUser } from "../../contexts/UserContext";
-
-/* GOT JSON (* 根據不同身分有不同欄位)
-{
-	address: "高雄",
-	*department: "資工系",
-	email: "123@gmail",
-	*grade: "3",
-	idNumber: "A123456789",
-	name: "王大明",
-	password: "password123",
-	phone: "0912345678",
-	role: "student",
-	*studentId: "A1115521"
-}
-*/
 
 function AdminEditProfilePage() {
 	const { ssn } = useParams();
@@ -29,25 +14,30 @@ function AdminEditProfilePage() {
 	const [msg, setMsg] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 	const [newPassword, setNewPassword] = useState("");
+	const role = new URLSearchParams(useLocation().search).get("role");
 
 	useEffect(() => {
 		if (isLoadingUser) return;
 		if (!userInfo.isLoggedIn || userInfo.role !== "admin") {
 			navigate("/login");
 		}
-	}, [userInfo, isLoadingUser]);
+	}, [userInfo, isLoadingUser, navigate]);
 
 	useEffect(() => {
-		fetch(`http://localhost:5000/api/profile?ssn=${ssn}`, {
-			credentials: "include",
-		})
-			.then((res) => res.json())
-			.then((data) => setProfile(data))
-			.catch((err) => {
+		const fetchProfile = async () => {
+			try {
+				const res = await fetch(`http://localhost:5000/api/profile?ssn=${ssn}`, {
+					credentials: "include",
+				});
+				const data = await res.json();
+				setProfile({ ...data, role });
+			} catch (err) {
 				console.error(err);
 				setError("無法載入使用者資料");
-			});
-	}, [ssn]);
+			}
+		};
+		fetchProfile();
+	}, [ssn, role]);
 
 	const handleChange = (e) => {
 		setProfile({ ...profile, [e.target.name]: e.target.value });
@@ -60,7 +50,8 @@ function AdminEditProfilePage() {
 		setMsg("");
 
 		try {
-			const body = { ...profile };
+			const body = { ...profile, role, ssn };
+			console.log(body);
 			if (newPassword) body.new_password = newPassword;
 
 			const res = await fetch("http://localhost:5000/api/admin/user", {
@@ -74,7 +65,7 @@ function AdminEditProfilePage() {
 				setError(result.msg || "更新失敗");
 			} else {
 				setMsg("更新成功");
-				setTimeout(() => navigate(-1), 1000);
+				setTimeout(() => navigate(-1), 2000);
 			}
 		} catch (err) {
 			setError(`伺服器錯誤。${err.message}`);
@@ -103,8 +94,6 @@ function AdminEditProfilePage() {
 			</>
 		);
 	}
-
-	const { role } = profile;
 
 	return (
 		<>

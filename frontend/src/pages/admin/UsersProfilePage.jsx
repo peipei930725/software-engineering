@@ -124,7 +124,7 @@ function UsersProfilePage() {
 										))}
 										<td className="border px-3 py-2">
 											<Link
-												to={`/admin/editprofile/${row.ssn}`}
+												to={`/admin/editprofile/${row.ssn}?role=${identity}`}
 												className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
 												align="center"
 											>
