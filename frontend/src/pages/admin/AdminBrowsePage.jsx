@@ -9,7 +9,7 @@ import "react-loading-skeleton/dist/skeleton.css";
 const identities = ["team", "piece"];
 const identityLabels = {
     team: "隊伍",
-    piece: "作品",
+    piece: "作品評分",
 };
 
 const identityApiMap = {

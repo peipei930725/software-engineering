@@ -1,9 +1,9 @@
 from flask import Blueprint, request, jsonify, current_app
 
-allteams_bp = Blueprint('allteams_bp', __name__)
+allscores_bp = Blueprint('allscores_bp', __name__)
 
-@allteams_bp.route('/table/teams', methods=['POST', 'OPTIONS'])
-def get_allteams():
+@allscores_bp.route('/table/pieces', methods=['POST', 'OPTIONS'])
+def get_allscores():
     if request.method == 'OPTIONS':
         return '', 200
 
@@ -12,8 +12,9 @@ def get_allteams():
     try:
         response = (
             sb
-            .table('team')
-            .select('*')
+            .table('team_view')
+            .select('judgename, title, name, score, year')
+            .not_.is_('score', 'null')
             .order('name', desc=False)
             .execute()
         )

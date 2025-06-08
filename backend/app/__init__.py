@@ -56,6 +56,9 @@ def create_app():
     from .admin.allteams import allteams_bp
     app.register_blueprint(allteams_bp, url_prefix='/api/admin')
 
+    from .admin.allscores import allscores_bp
+    app.register_blueprint(allscores_bp, url_prefix='/api/admin')
+
     from .admin.editUser import admin_bp
     app.register_blueprint(admin_bp, url_prefix='/api/admin')
 
