@@ -1,11 +1,12 @@
 from flask import Blueprint, request, jsonify, current_app
 from werkzeug.security import generate_password_hash
-from .. import db
+
 
 report_bp = Blueprint('report', __name__)
 
-@report_bp.route('/api/report', methods=['POST'])
+@report_bp.route('/report', methods=['POST'])
 def report():
+    print("收到申述請求")
     data = request.get_json() or {}
     if not data:
         return jsonify({"message": "No data provided"}), 400
