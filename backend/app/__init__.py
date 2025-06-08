@@ -49,6 +49,12 @@ def create_app():
     from .report.report import report_bp
     app.register_blueprint(report_bp, url_prefix='/api')
     
+    from .admin.allUser import alluser_bp
+    app.register_blueprint(alluser_bp, url_prefix='/api/admin')
+
+    from .admin.editUser import admin_bp
+    app.register_blueprint(admin_bp, url_prefix='/api/admin')
+
     # 將 supabase 客戶端掛載到 app（若需要 global 存取）
     app.supabase = supabase
 
