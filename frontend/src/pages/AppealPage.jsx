@@ -17,6 +17,7 @@ function AppealPage() {
 	// 如果沒有登入或不是學生或老師，則重定向到登入頁面
 	useEffect(() => {
 		if (isLoadingUser) return; // 等待使用者資訊載入完成
+		else setForm({...form, id: userInfo.ssn});
 		if (!userInfo.isLoggedIn || !(userInfo.role === "student" || userInfo.role === "teacher")) {
 			// 有登入 而且 是老師或學生  => 沒登入 或 不是(老師或學生)
 			navigate("/login");
@@ -30,6 +31,7 @@ function AppealPage() {
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		setMessage("");
+		console.log(form);
 		try {
 			const res = await fetch("http://localhost:5000/api/report", {
 				method: "POST",
@@ -69,16 +71,15 @@ function AppealPage() {
 					<form className="space-y-6" onSubmit={handleSubmit}>
 						<div>
 							<label className="block font-semibold mb-2">
-								身分證字號{" "}
-								<span className="text-red-600">*</span>
+								身分證字號
 							</label>
 							<input
 								type="text"
 								name="id"
-								value={form.id}
-								onChange={handleChange}
+								value={userInfo.ssn}
 								required
 								className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-200"
+								disabled
 								placeholder="請輸入您的身分證字號"
 							/>
 						</div>
