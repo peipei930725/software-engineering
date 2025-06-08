@@ -21,6 +21,7 @@ function UsersProfilePage() {
 	const [data, setData] = useState([]);
 	const [columns, setColumns] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
+	const [searchQuery, setSearchQuery] = useState("");
 
 	useEffect(() => {
 		if (isLoadingUser) return;
@@ -59,6 +60,12 @@ function UsersProfilePage() {
 		fetchData();
 	}, [identity]);
 
+	const filteredData = data.filter((row) =>
+		columns.some((col) =>
+			row[col]?.toString().toLowerCase().includes(searchQuery.toLowerCase())
+		)
+	);
+
 	return (
 		<>
 			<Navbar />
@@ -66,9 +73,6 @@ function UsersProfilePage() {
 				<header className="text-center">
 					<h2 className="text-3xl md:text-4xl font-bold">
 						所有 {fieldNameToLabel[identity]} 使用者資料
-						<span className="text-2xl"> (使用 </span>
-						<span className="text-2xl text-red-600">Ctrl + F</span>
-						<span className="text-2xl"> 進行查詢)</span>
 					</h2>
 				</header>
 
@@ -89,12 +93,20 @@ function UsersProfilePage() {
 				</div>
 
 				<div className="mx-auto w-11/12 md:w-4/5 bg-white text-black rounded-xl shadow-lg p-6 overflow-x-auto">
+					<input
+						type="text"
+						placeholder="搜尋關鍵字..."
+						value={searchQuery}
+						onChange={(e) => setSearchQuery(e.target.value)}
+						className="mb-4 px-4 py-2 border border-gray-300 rounded w-full md:w-1/2"
+					/>
+
 					{isLoading ? (
 						<>
-							<Skeleton height={40} width = {200} className="mb-3" baseColor="#d9e3ec" highlightColor="#f0f4f8"/>
-							<Skeleton count={6} height={40} className="mb-3" baseColor="#d9e3ec" highlightColor="#f0f4f8"/>
+							<Skeleton height={40} width={200} className="mb-3" baseColor="#d9e3ec" highlightColor="#f0f4f8" />
+							<Skeleton count={6} height={40} className="mb-3" baseColor="#d9e3ec" highlightColor="#f0f4f8" />
 						</>
-					) : data.length > 0 ? (
+					) : filteredData.length > 0 ? (
 						<div className="min-w-max">
 							<table className="table-auto w-full border-collapse">
 								<thead>
@@ -113,20 +125,15 @@ function UsersProfilePage() {
 									</tr>
 								</thead>
 								<tbody>
-									{data.map((row, idx) => (
+									{filteredData.map((row, idx) => (
 										<tr
 											key={idx}
 											className={
-												idx % 2 === 0
-													? "bg-gray-100"
-													: "bg-white"
+												idx % 2 === 0 ? "bg-gray-100" : "bg-white"
 											}
 										>
 											{columns.map((col) => (
-												<td
-													key={col}
-													className="border px-3 py-2"
-												>
+												<td key={col} className="border px-3 py-2">
 													{row[col]}
 												</td>
 											))}
