@@ -320,7 +320,7 @@ function EditAnnouncementPage() {
                       {a.context}
                     </div>
                     <div className="text-xs text-gray-400 mt-2">
-                      發布者：{a.admin_ssn}
+                      發布者：{a.admin_name}
                     </div>
                     {userInfo.role === "admin" && (
                       <button
