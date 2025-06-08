@@ -114,7 +114,7 @@ export default function EditTeamInfoPage() {
       navigate("/login");
       return;
     }
-    fetch("http://localhost:5000/api/team/info", { credentials: "include" })
+    fetch(`http://localhost:5000/api/team/info?ssn=${encodeURIComponent(userInfo.ssn)}`, { credentials: "include" })
       .then((res) => res.ok ? res.json() : Promise.reject())
       .then((data) => {
         dispatch({ type: "SET_TEAM", payload: data });
@@ -187,7 +187,7 @@ export default function EditTeamInfoPage() {
       students: teamInfo.students.filter((_, idx) => !deleteChecked[idx]),
     };
     try {
-      const res = await fetch("http://localhost:5000/api/team/edit", {
+      const res = await fetch(`http://localhost:5000/api/team/edit?ssn=${encodeURIComponent(userInfo.ssn)}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
