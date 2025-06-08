@@ -83,7 +83,7 @@ const staticPiecesByTid = {
 const availableYears = [2023, 2024, 2025];
 
 function GudieTeamPage() {
-  const { userInfo } = useUser();
+  const { userInfo, isLoadingUser } = useUser();
   const navigate = useNavigate();
 
   const [teams, setTeams] = useState(staticTeamsByYear[2025]);
@@ -93,6 +93,7 @@ function GudieTeamPage() {
 
   // 權限與隊伍資料
   useEffect(() => {
+    if (isLoadingUser) return; // 等待用戶資訊載入完成
     if (!userInfo.isLoggedIn || userInfo.role !== "teacher") {
       navigate("/login");
       return;
@@ -113,7 +114,7 @@ function GudieTeamPage() {
         setError(err.message + "，已載入靜態資料。");
         setTeams(staticTeamsByYear[selectedYear] || []);
       });
-  }, [userInfo, navigate, selectedYear]);
+  }, [userInfo, isLoadingUser, navigate, selectedYear]);
 
   // 取得每個隊伍的作品
   useEffect(() => {
