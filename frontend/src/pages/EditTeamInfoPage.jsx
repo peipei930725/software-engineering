@@ -125,24 +125,30 @@ function TeacherEditor({ ssn, name, error, onSsnChange }) {
   );
 }
 
-// StudentEditor
 function StudentEditor({ idx, ssn, name, error, checked, onSsnChange, onDeleteCheck }) {
+  const isFirst = idx === 0;
   return (
     <div className="flex items-center gap-2">
-      <input
-        type="checkbox"
-        checked={checked}
-        onChange={() => onDeleteCheck(idx)}
-        className="mr-2"
-        title="勾選刪除"
-      />
+      {/* 第一位學生不顯示刪除勾選 */}
+      {!isFirst && (
+        <input
+          type="checkbox"
+          checked={checked}
+          onChange={() => onDeleteCheck(idx)}
+          className="mr-2"
+          title="勾選刪除"
+        />
+      )}
       <input
         type="text"
         value={ssn}
-        onChange={e => onSsnChange(idx, e.target.value)}
+        // 第一位學生 input 禁止修改
+        onChange={isFirst ? undefined : e => onSsnChange(idx, e.target.value)}
         className="px-2 py-1 border border-gray-300 rounded w-40"
         required
         placeholder="身分證字號"
+        readOnly={isFirst}
+        style={isFirst ? { backgroundColor: "#f3f4f6", color: "#888" } : {}}
       />
       <span className="ml-2 text-gray-700">{name || "查無"}</span>
       {error && <span className="ml-2 text-red-600 text-sm">{error}</span>}
@@ -172,6 +178,22 @@ export default function EditTeamInfoPage() {
         return res.json();
       })
       .then(data => {
+        if (!data || !data.students) throw new Error("隊伍資料格式錯誤");
+        // 讓自己的 ssn 在第一位
+        const mySsn = userInfo.ssn;
+        let students = data.students || [];
+        const myIdx = students.findIndex(stu => stu.ssn === mySsn);
+        if (myIdx !== 0 && myIdx !== -1) {
+        // 把自己移到第一位
+        const [myStu] = students.splice(myIdx, 1);
+        students.unshift(myStu);
+        }
+      // 若找不到自己，則加在第一位
+      if (myIdx === -1) {
+        students.unshift({ ssn: mySsn, name: userInfo.name || "" });
+      }
+  data.students = students;
+  dispatch({ type: "FETCH_SUCCESS", payload: data });
         if (!data || !data.students) throw new Error("隊伍資料格式錯誤");
         dispatch({ type: "FETCH_SUCCESS", payload: data });
       })
