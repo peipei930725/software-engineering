@@ -1,72 +1,114 @@
-import React, { useEffect, useReducer, useState, useCallback } from "react";
+import React, { useEffect, useReducer } from "react";
 import Navbar from "../components/Navbar.jsx";
 import { useUser } from "../contexts/UserContext";
 import { useNavigate } from "react-router-dom";
 
-// 預設資料
-const staticTeamInfo = {
-  tid: 1,
-  team_name: "AI創意隊",
-  teacher_ssn: "T123456789",
-  teacher_name: "張老師",
-  year: 2025,
-  students: [
-    { ssn: "A123456789", name: "王小明" },
-    { ssn: "B234567890", name: "李小華" },
-    { ssn: "C345678901", name: "陳大仁" },
-    { ssn: "D456789012", name: "林小美" },
-  ],
+// 共用 API hooks
+function useTeamApi() {
+  // 查學生姓名
+  const fetchStudentNameBySsn = async (ssn) => {
+    if (!ssn) return "";
+    const res = await fetch(
+      `http://localhost:5000/api/isstd?ssn=${encodeURIComponent(ssn)}`,
+      { credentials: "include" }
+    );
+    if (!res.ok) throw new Error("查無此身分證字號");
+    const data = await res.json();
+    return data.username;
+  };
+  // 查老師姓名
+  const fetchTeacherNameBySsn = async (ssn) => {
+    if (!ssn) return "";
+    const res = await fetch(
+      `http://localhost:5000/api/istc?ssn=${encodeURIComponent(ssn)}`,
+      { credentials: "include" }
+    );
+    if (!res.ok) throw new Error("查無此身分證字號");
+    const data = await res.json();
+    return data.username;
+  };
+  return { fetchStudentNameBySsn, fetchTeacherNameBySsn };
+}
+
+// 初始狀態
+const initialState = {
+  teamInfo: null,
+  loading: false,
+  error: "",
+  msg: "",
+  studentErrors: {},
+  teacherError: "",
+  deleteChecked: [],
+  submitting: false,
 };
 
-// 共用 API 查詢
-async function fetchStudentNameBySsn(ssn) {
-  if (!ssn) return "";
-  const res = await fetch(
-    `http://localhost:5000/api/isstd?ssn=${(ssn)}`,
-    { credentials: "include" }
-  );
-  if (!res.ok) throw new Error("查無此身分證字號");
-  const data = await res.json();
-  console.log("API 回傳資料：", data);
-  return data.username;
-}
-
-async function fetchTeacherNameBySsn(ssn) {
-  if (!ssn) return "";
-  const res = await fetch(
-    `http://localhost:5000/api/istc?ssn=${(ssn)}`,
-    { credentials: "include" }
-  );
-  if (!res.ok) throw new Error("查無此身分證字號");
-  const data = await res.json();
-  console.log("API 回傳資料：", data);
-  return data.username;
-}
-
-// reducer 處理 team 狀態
-function teamReducer(state, action) {
+// reducer
+function reducer(state, action) {
   switch (action.type) {
-    case "SET_TEAM":
-      return { ...state, ...action.payload };
+    case "FETCH_START":
+      return { ...state, loading: true, error: "" };
+    case "FETCH_SUCCESS":
+      return {
+        ...state,
+        loading: false,
+        teamInfo: action.payload,
+        deleteChecked: Array(action.payload.students.length).fill(false),
+        error: "",
+      };
+    case "FETCH_ERROR":
+      return { ...state, loading: false, error: action.payload, teamInfo: null };
     case "SET_TEACHER":
-      return { ...state, teacher_ssn: action.ssn, teacher_name: action.name };
+      return {
+        ...state,
+        teamInfo: {
+          ...state.teamInfo,
+          teacher_ssn: action.ssn,
+          teacher_name: action.name,
+        },
+        teacherError: action.error || "",
+      };
     case "SET_STUDENT":
-      const students = [...state.students];
+      const students = [...state.teamInfo.students];
       students[action.idx] = { ...students[action.idx], ...action.payload };
-      return { ...state, students };
+      return {
+        ...state,
+        teamInfo: { ...state.teamInfo, students },
+        studentErrors: { ...state.studentErrors, [action.idx]: action.error || "" },
+      };
     case "ADD_STUDENT":
-      return { ...state, students: [...state.students, { ssn: "", name: "" }] };
-    case "REMOVE_STUDENTS":
-      return { ...state, students: state.students.filter((_, idx) => !action.checked[idx]) };
+      return {
+        ...state,
+        teamInfo: {
+          ...state.teamInfo,
+          students: [...state.teamInfo.students, { ssn: "", name: "" }],
+        },
+        deleteChecked: [...state.deleteChecked, false],
+      };
+    case "TOGGLE_DELETE":
+      return {
+        ...state,
+        deleteChecked: state.deleteChecked.map((c, i) =>
+          i === action.idx ? !c : c
+        ),
+      };
     case "SET_FIELD":
-      return { ...state, [action.field]: action.value };
+      return {
+        ...state,
+        teamInfo: { ...state.teamInfo, [action.field]: action.value },
+      };
+    case "SET_MSG":
+      return { ...state, msg: action.payload };
+    case "SET_SUBMITTING":
+      return { ...state, submitting: action.payload };
+    case "SET_ERROR":
+      return { ...state, error: action.payload };
     default:
       return state;
   }
 }
 
-// 教師欄位編輯
-function TeacherEditor({ ssn, name, onSsnChange, error }) {
+// TeacherEditor
+function TeacherEditor({ ssn, name, error, onSsnChange }) {
   return (
     <div>
       <label className="block font-bold mb-1">指導老師身分證字號</label>
@@ -83,7 +125,7 @@ function TeacherEditor({ ssn, name, onSsnChange, error }) {
   );
 }
 
-// 學生欄位編輯
+// StudentEditor
 function StudentEditor({ idx, ssn, name, error, checked, onSsnChange, onDeleteCheck }) {
   return (
     <div className="flex items-center gap-2">
@@ -111,78 +153,66 @@ function StudentEditor({ idx, ssn, name, error, checked, onSsnChange, onDeleteCh
 export default function EditTeamInfoPage() {
   const { userInfo, isLoadingUser } = useUser();
   const navigate = useNavigate();
+  const { fetchStudentNameBySsn, fetchTeacherNameBySsn } = useTeamApi();
 
-  const [teamInfo, dispatch] = useReducer(teamReducer, staticTeamInfo);
-  const [error, setError] = useState("");
-  const [msg, setMsg] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [studentErrors, setStudentErrors] = useState({});
-  const [teacherError, setTeacherError] = useState("");
-  const [deleteChecked, setDeleteChecked] = useState({});
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const { teamInfo, loading, error, msg, studentErrors, teacherError, deleteChecked, submitting } = state;
 
-  // 初始化
+  // 載入隊伍資料
   useEffect(() => {
     if (isLoadingUser) return;
-    if (!userInfo.isLoggedIn || userInfo.role !== "student") {
+    if (!userInfo?.isLoggedIn || userInfo?.role !== "student") {
       navigate("/login");
       return;
     }
+    dispatch({ type: "FETCH_START" });
     fetch(`http://localhost:5000/api/team/info?ssn=${encodeURIComponent(userInfo.ssn)}`, { credentials: "include" })
-      .then((res) => res.ok ? res.json() : Promise.reject())
-      .then((data) => {
-        dispatch({ type: "SET_TEAM", payload: data });
-        const checks = {};
-        (data.students || []).forEach((_, idx) => (checks[idx] = false));
-        setDeleteChecked(checks);
+      .then(res => {
+        if (!res.ok) throw new Error("無法取得隊伍資料");
+        return res.json();
       })
-      .catch(() => {
-        setError("後端連線失敗，顯示預設資料。");
-        dispatch({ type: "SET_TEAM", payload: staticTeamInfo });
-        const checks = {};
-        (staticTeamInfo.students || []).forEach((_, idx) => (checks[idx] = false));
-        setDeleteChecked(checks);
+      .then(data => {
+        if (!data || !data.students) throw new Error("隊伍資料格式錯誤");
+        dispatch({ type: "FETCH_SUCCESS", payload: data });
+      })
+      .catch(err => {
+        dispatch({ type: "FETCH_ERROR", payload: err.message || "後端連線失敗，無法取得隊伍資料。" });
       });
   }, [userInfo, isLoadingUser, navigate]);
 
-  // 教授變更
-  const handleTeacherSsnChange = useCallback(async (newSsn) => {
-    setTeacherError("");
+  // 教師身分證字號變更
+  const handleTeacherSsnChange = async (newSsn) => {
     dispatch({ type: "SET_TEACHER", ssn: newSsn, name: "" });
     if (!newSsn) return;
     try {
       const name = await fetchTeacherNameBySsn(newSsn);
-      dispatch({ type: "SET_TEACHER", ssn: newSsn, name });
+      dispatch({ type: "SET_TEACHER", ssn: newSsn, name, error: "" });
     } catch {
-      setTeacherError("查無此身分證字號");
-      dispatch({ type: "SET_TEACHER", ssn: newSsn, name: "" });
+      dispatch({ type: "SET_TEACHER", ssn: newSsn, name: "", error: "查無此身分證字號" });
     }
-  }, []);
+  };
 
-  // 學生變更
-  const handleStudentSsnChange = useCallback(async (idx, newSsn) => {
-    setStudentErrors((prev) => ({ ...prev, [idx]: "" }));
-    dispatch({ type: "SET_STUDENT", idx, payload: { ssn: newSsn, name: "" } });
+  // 學生身分證字號變更
+  const handleStudentSsnChange = async (idx, newSsn) => {
+    dispatch({ type: "SET_STUDENT", idx, payload: { ssn: newSsn, name: "" }, error: "" });
     if (!newSsn) return;
     try {
       const name = await fetchStudentNameBySsn(newSsn);
-      dispatch({ type: "SET_STUDENT", idx, payload: { ssn: newSsn, name } });
+      dispatch({ type: "SET_STUDENT", idx, payload: { ssn: newSsn, name }, error: "" });
     } catch {
-      setStudentErrors((prev) => ({ ...prev, [idx]: "查無此身分證字號" }));
-      dispatch({ type: "SET_STUDENT", idx, payload: { ssn: newSsn, name: "" } });
+      dispatch({ type: "SET_STUDENT", idx, payload: { ssn: newSsn, name: "" }, error: "查無此身分證字號" });
     }
-  }, []);
+  };
 
-  // 新增成員
-  const handleAddStudent = useCallback(() => {
+  // 新增隊員
+  const handleAddStudent = () => {
     dispatch({ type: "ADD_STUDENT" });
-    setStudentErrors((prev) => ({ ...prev, [teamInfo.students.length]: "" }));
-    setDeleteChecked((prev) => ({ ...prev, [teamInfo.students.length]: false }));
-  }, [teamInfo.students.length]);
+  };
 
   // 勾選刪除
-  const handleDeleteCheck = useCallback((idx) => {
-    setDeleteChecked((prev) => ({ ...prev, [idx]: !prev[idx] }));
-  }, []);
+  const handleDeleteCheck = (idx) => {
+    dispatch({ type: "TOGGLE_DELETE", idx });
+  };
 
   // 表單欄位
   const handleChange = (e) => {
@@ -192,9 +222,9 @@ export default function EditTeamInfoPage() {
   // 送出
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMsg("");
-    setError("");
-    setIsLoading(true);
+    dispatch({ type: "SET_MSG", payload: "" });
+    dispatch({ type: "SET_ERROR", payload: "" });
+    dispatch({ type: "SET_SUBMITTING", payload: true });
     const submitData = {
       ...teamInfo,
       students: teamInfo.students.filter((_, idx) => !deleteChecked[idx]),
@@ -208,23 +238,23 @@ export default function EditTeamInfoPage() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.message || "更新失敗");
+        dispatch({ type: "SET_ERROR", payload: data.message || "更新失敗" });
       } else {
-        setMsg("隊伍資訊更新成功！");
+        dispatch({ type: "SET_MSG", payload: "隊伍資訊更新成功！" });
         setTimeout(() => navigate("/teaminfo"), 1200);
       }
     } catch {
-      setError("無法連接伺服器");
+      dispatch({ type: "SET_ERROR", payload: "無法連接伺服器" });
     }
-    setIsLoading(false);
+    dispatch({ type: "SET_SUBMITTING", payload: false });
   };
 
-  if (!teamInfo) {
+  if (loading || !teamInfo) {
     return (
       <>
         <Navbar />
         <div className="bg-[#023047] text-white min-h-screen flex items-center justify-center">
-          載入中...
+          {error ? error : "載入中..."}
         </div>
       </>
     );
@@ -253,8 +283,8 @@ export default function EditTeamInfoPage() {
             <TeacherEditor
               ssn={teamInfo.teacher_ssn}
               name={teamInfo.teacher_name}
-              onSsnChange={handleTeacherSsnChange}
               error={teacherError}
+              onSsnChange={handleTeacherSsnChange}
             />
             <div>
               <label className="block font-bold mb-1">年度</label>
@@ -292,10 +322,10 @@ export default function EditTeamInfoPage() {
             </div>
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={submitting}
               className="w-full py-3 bg-[#219ebc] text-white font-bold rounded hover:bg-[#126782] disabled:opacity-50"
             >
-              {isLoading ? "送出中..." : "確認修改"}
+              {submitting ? "送出中..." : "確認修改"}
             </button>
           </form>
         </div>

@@ -81,6 +81,7 @@ def team_info():
             )
             name = u_resp.data.get('name') if getattr(u_resp, 'data', None) else ''
             students.append({
+                'ssn':        s.get('ssn'),         # <<== 加入這一行
                 'name':       name,
                 'sid':        s.get('sid'),
                 'department': s.get('department'),
@@ -91,6 +92,7 @@ def team_info():
         payload = {
             'tid':          team.get('tid'),
             'team_name':    team.get('name'),
+             'teacher_ssn':  teacher_ssn,  # <== 新增這一行
             'teacher_name': teacher_name,
             'year':         team.get('year'),
             'rank':         team.get('rank'),
