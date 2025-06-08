@@ -19,7 +19,7 @@ function StudentViewFeedbackPage() {
     setError("");
     try {
       // 1. 取得學生所屬隊伍
-      const teamRes = await fetch("http://localhost:5000/api/student/team", {
+      const teamRes = await fetch(`http://localhost:5000/api/team/info?ssn=${encodeURIComponent(userInfo.ssn)}`, {
         credentials: "include",
       });
       if (!teamRes.ok) throw new Error("查無隊伍資料");
@@ -28,7 +28,7 @@ function StudentViewFeedbackPage() {
 
       // 2. 取得該隊伍所有評分與回饋
       const fbRes = await fetch(
-        `http://localhost:5000/api/team/feedback?tid=${teamData.tid}`,
+        `http://localhost:5000/api/team/feedback?tid=${teamData.tid}&ssn=${encodeURIComponent(userInfo.ssn)}`,
         { credentials: "include" }
       );
       if (!fbRes.ok) throw new Error("查無評分資料");
