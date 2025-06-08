@@ -1,20 +1,40 @@
+# app/report/report.py
+
 from flask import Blueprint, request, jsonify, current_app
-from werkzeug.security import generate_password_hash
 
+report_bp = Blueprint('report_bp', __name__)
 
-report_bp = Blueprint('report', __name__)
-
-@report_bp.route('/report', methods=['POST'])
+@report_bp.route('/appeal', methods=['POST', 'OPTIONS'])
 def report():
-    print("收到申述請求")
+    # 處理 CORS 預檢
+    if request.method == 'OPTIONS':
+        return '', 200
+
     data = request.get_json() or {}
-    if not data:
-        return jsonify({"message": "No data provided"}), 400
     Id = data.get("id")
     content = data.get("content")
+
+    # 必填檢查
     if not Id or not content:
         return jsonify({"message": "請填寫完整"}), 400
-    
 
-    print(f"申述人: {Id}\n內容: {content}")
-    return jsonify({"message": "成功提交"}),200
+    sb = current_app.supabase
+
+    # 插入申訴
+    try:
+        payload = {
+            "user_ssn": Id,
+            "content": content
+            # aid 由資料庫自動產生
+        }
+        ins = sb.from_("appeal").insert([payload]).execute()
+    except Exception as e:
+        current_app.logger.error(f"POST /appeal 失敗：{e}")
+        return jsonify({"message": "伺服器錯誤，無法提交申訴"}), 500
+
+    # Supabase 若 insert 成功會回 data 列表
+    if not ins.data:
+        current_app.logger.error(f"POST /appeal 無回傳 data：{ins}")
+        return jsonify({"message": "提交失敗"}), 500
+
+    return jsonify({"message": "成功提交"}), 200
