@@ -48,7 +48,7 @@ export default function App() {
 				<Route path="/grade" element={<GradePage/>}/>
 				<Route path="/editgrade" element={<EditGradePage/>}/>
 				{/* 學生路由 */}
-				<Route path="/editpiece" element={<EditPiecePage/>}/>
+				<Route path="/editpiece/:tid" element={<EditPiecePage/>}/>
 				<Route path="/teamreg" element={<TeamRegisterPage />} />
 				<Route path="/subpiece" element={<SubmitPiecePage />} />
 				<Route path="/teaminfo" element={<TeamInfoPage/>}/>

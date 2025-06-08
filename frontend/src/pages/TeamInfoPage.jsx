@@ -45,7 +45,6 @@ function TeamInfoPage() {
       if (!res.ok) throw new Error("未找到相關隊伍資料");
 
       const data = await res.json();
-      console.log(data);
       setTeamInfo(data);
     } catch (err) {
       setError(`後端連線失敗，顯示預設資料。${err}`);
@@ -132,7 +131,7 @@ function TeamInfoPage() {
                   上傳作品
                 </button>
                 <button
-                  onClick={() => navigate("/editpiece")}
+                  onClick={() => navigate(`/editpiece/${teamInfo.tid}`)}
                   className="px-6 py-2 bg-[black] text-white rounded-lg font-bold hover:bg-[#126782] transition"
                 >
                   修改作品

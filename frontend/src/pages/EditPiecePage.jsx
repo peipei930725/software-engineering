@@ -6,8 +6,9 @@ import Navbar from "../components/Navbar.jsx";
 function EditPiecePage() {
   const { userInfo, isLoadingUser } = useUser();
   const navigate = useNavigate();
-  const { pid } = useParams();
-
+  const { tid } = useParams();
+  console.log(tid);
+  
   const [form, setForm] = useState({
     tid: "",
     name: "",
@@ -32,7 +33,7 @@ function EditPiecePage() {
     const fetchPiece = async () => {
       setIsLoading(true);
       try {
-        const res = await fetch(`http://localhost:5000/api/piece/${pid}`, {
+        const res = await fetch(`http://localhost:5000/api/piece/${tid}`, {
           method: "GET",
           credentials: "include",
           headers: { "Content-Type": "application/json" },
@@ -59,7 +60,7 @@ function EditPiecePage() {
     };
 
     fetchPiece();
-  }, [pid, isLoadingUser]);
+  }, [tid, isLoadingUser]);
 
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -79,7 +80,7 @@ function EditPiecePage() {
 
     setIsLoading(true);
     try {
-      const res = await fetch(`http://localhost:5000/api/piece?pid=${pid}`, {
+      const res = await fetch(`http://localhost:5000/api/piece?tid=${tid}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
