@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useUser } from "../contexts/UserContext";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 function TeamRegisterPage() {
   const [form, setForm] = useState({
@@ -25,6 +27,7 @@ function TeamRegisterPage() {
 			// 有登入 而且 是學收  => 沒登入 或 不是學生
 			navigate("/login");
 		}
+    console.log(userInfo);
     setForm({ ...form, student1_id: userInfo.ssn }); // 預設學生1的身分證字號為當前用戶的身分證字號，這欄不套用onchange，所以在渲染時執行一次
   }, [userInfo, isLoadingUser, navigate]);
 
@@ -89,13 +92,33 @@ function TeamRegisterPage() {
             onChange={handleChange}
             required
           />
-          <InputColumn
-            label="學生1的身分證字號"
-            name="student1_id"
-            value={userInfo.ssn}
-            required
-            disabled
-          />
+          {isLoadingUser ? (
+            <>
+              <div>
+                <label className="block font-semibold mb-1">
+                  學生1的身分證字號
+                </label>
+                <Skeleton
+                  count={1}
+                  width={`100%`}
+                  height={40}
+                  baseColor="#d9e3ec"
+                  highlightColor="#f0f4f8"
+                />
+              </div>
+            </>
+          ) : (
+            <>
+              <InputColumn
+              label="學生1的身分證字號"
+              name="student1_id"
+              value={userInfo.ssn}
+              required
+              disabled
+            />
+            </>
+          )}
+          
           <InputColumn
             label="學生2的身分證字號"
             name="student2_id"

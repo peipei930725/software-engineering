@@ -46,7 +46,8 @@ function LoginPage() {
 					setUserInfo({
 						isLoggedIn: true,
 						username: data.data.name,
-						role: data.data.role
+						role: data.data.role,
+						ssn: data.data.ssn
 					});
 				
 				navigate("/home");
