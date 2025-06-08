@@ -32,6 +32,8 @@ def create_app():
 
     from .auth.auth import auth_api
     app.register_blueprint(auth_api, url_prefix='/api')
+    from .auth.profile import profile_bp
+    app.register_blueprint(profile_bp, url_prefix='/api')
 
     from .getdata.projects import projects_bp
     app.register_blueprint(projects_bp, url_prefix='/api')
