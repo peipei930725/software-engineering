@@ -33,14 +33,13 @@ def edit_piece(tid):
             .execute()
         )
     except Exception as e:
-        current_app.logger.error(f"更新作品例外（tid={tid}）：{e}")
+        print(f"更新作品例外（tid={tid}）：{e}")
         return jsonify({'success': False, 'message': '伺服器錯誤'}), 500
 
-    # 3) 錯誤或找不到該作品
-    if resp.error:
-        return jsonify({'success': False, 'message': resp.error.message}), 500
+    # 3) 判斷是否有更新到資料
+    # Supabase-py 返回的 resp.data 是 list，若更新不到任何列則為空 list
     if not resp.data:
-        return jsonify({'success': False, 'message': '找不到該作品'}), 404
+        return jsonify({'success': False, 'message': '找不到該作品或無欄位變更'}), 404
 
     # 4) 回傳成功
     return jsonify({'success': True, 'message': '作品已更新！'}), 200
