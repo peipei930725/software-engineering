@@ -6,8 +6,7 @@ import Navbar from "../components/Navbar.jsx";
 function EditPiecePage() {
   const { userInfo, isLoadingUser } = useUser();
   const navigate = useNavigate();
-  const { pid } = useParams(); // 作品ID從路由取得
-  console.log(pid);
+  const { pid } = useParams();
 
   const [form, setForm] = useState({
     tid: "",
@@ -21,49 +20,49 @@ function EditPiecePage() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  // 權限檢查
   useEffect(() => {
     if (isLoadingUser) return;
-    if (!userInfo.isLoggedIn || userInfo.role !== "student") {
+    if (!userInfo?.isLoggedIn || userInfo.role !== "student") {
       navigate("/login");
     }
   }, [userInfo, isLoadingUser, navigate]);
 
-  // 載入現有作品資料
   useEffect(() => {
-  if (!pid) return;
+  
+    const fetchPiece = async () => {
+      setIsLoading(true);
+      try {
+        const res = await fetch(`http://localhost:5000/api/piece/${pid}`, {
+          method: "GET",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+        });
+        
 
-  const fetchPiece = async () => {
-    setIsLoading(true);
-    try {
-      const res = await fetch(`http://localhost:5000/api/piece/${pid}`, {
-        credentials: "include",
-      });
-      if (!res.ok) throw new Error("找不到作品資料");
+        if (!res.ok) throw new Error("找不到作品資料");
+        const data = await res.json();
 
-      const data = await res.json();
-      setForm({
-        tid: data.tid,
-        name: data.name,
-        demo: data.demo,
-        poster: data.poster,
-        code: data.code,
-        document: data.document,
-      });
-      setError("");
-    } catch (err) {
-      setError(`載入作品失敗：${err}`);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+        setForm({
+          tid: data.tid || "",
+          name: data.name || "",
+          demo: data.demo || "",
+          poster: data.poster || "",
+          code: data.code || "",
+          document: data.document || "",
+        });
+        setError("");
+      } catch (err) {
+        setError(`載入作品失敗：${err instanceof Error ? err.message : String(err)}`);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  fetchPiece();
-}, [pid]);
-
+    fetchPiece();
+  }, [pid, isLoadingUser]);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleSubmit = async (e) => {
@@ -71,9 +70,9 @@ function EditPiecePage() {
     setMsg("");
     setError("");
 
-    const fields = ["name", "demo", "poster", "code", "document"];
-    const isEmpty = fields.some((key) => !form[key]);
-    if (isEmpty) {
+    const requiredFields = ["name", "demo", "poster", "code", "document"];
+    const hasEmptyField = requiredFields.some((field) => !form[field]);
+    if (hasEmptyField) {
       setError("請填寫所有欄位！");
       return;
     }
@@ -86,7 +85,9 @@ function EditPiecePage() {
         credentials: "include",
         body: JSON.stringify(form),
       });
+
       const data = await res.json();
+
       if (res.ok) {
         setMsg(data.message || "作品資訊已修改！");
         setTimeout(() => navigate("/home"), 1200);
@@ -94,9 +95,10 @@ function EditPiecePage() {
         setError(data.message || "修改失敗，請檢查資料。");
       }
     } catch (err) {
-      setError(`無法連接伺服器。${err}`);
+      setError(`無法連接伺服器。${err instanceof Error ? err.message : String(err)}`);
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   return (
