@@ -1,0 +1,32 @@
+/* src/index.css */
+
+/* 全域佈局 */
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background-color: #2f2f2f; /* 深灰色背景 */
+    font-family: sans-serif;
+  }
+  
+  /* 讓 #root 也能填滿高度，配合 App.jsx 的 100vh */
+  #root {
+    height: 100%;
+  }
+  
+  /* 全域按鈕樣式 */
+  button {
+    background-color: #ff00ff; /* 螢光粉 */
+    color: #000;               /* 黑字 */
+    border: none;
+    border-radius: 4px;
+    padding: 0.6rem 1.2rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  
+  button:hover {
+    opacity: 0.85;
+  }
+  

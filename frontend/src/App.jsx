@@ -1,35 +1,66 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+// src/App.jsx
+import { Routes, Route, Navigate } from "react-router-dom";
+import { UserProvider } from "./contexts/UserContext.jsx";
+import TestBack from "./TestBack.jsx";
+import HomePage from "./pages/HomePage.jsx";
+import LoginPage from "./pages/LoginPage.jsx";
+import RegisterPage from "./pages/RegisterPage.jsx";
+import NotFoundPage from "./pages/NotFoundPage.jsx";
+import BrowseProjectPage from "./pages/BrowseProjectPage.jsx";
+import TeamRegisterPage from "./pages/TeamRegisterPage.jsx";
+import InfoPage from "./pages/InfoPage.jsx";
+import AppealPage from "./pages/AppealPage.jsx";
+import EditProfilePage from "./pages/EditProfilePage.jsx";
+import SubmitPiecePage from "./pages/SubmitPiecePage.jsx";
+import EditAnnouncementPage from "./pages/EditAnnouncementPage.jsx";
+import UsersProfilePage from "./pages/admin/UsersProfilePage.jsx";
+import AdminEditProfilePage from "./pages/admin/AdminEditProfilePage.jsx";
+import EditPiecePage from "./pages/EditPiecePage.jsx";
+import TeamInfoPage from "./pages/TeamInfoPage.jsx";
+import GradePage from "./pages/judge/GradePage.jsx";
+import EditGradePage from "./pages/judge/EditGradePage.jsx";
+import GuideTeamPage from "./pages/teacher/GuideTeamPage.jsx";
+import AdminAppealPage from "./pages/admin/AdminAppealPage.jsx";
+import EditTeamInfoPage from "./pages/EditTeamInfoPage.jsx";
+import StudentViewFeedbackPage from "./pages/StudentViewFeedbackPage.jsx";
+import AdminBrowsePage from "./pages/admin/AdminBrowsePage.jsx";
+// App 主元件
+export default function App() {
+	return (
+		<UserProvider>
+			<Routes>
+				<Route path="/" element={<Navigate to="/home" replace />} />
+				<Route path="/home" element={<HomePage />} />
+				<Route path="/login" element={<LoginPage />} />
+				<Route path="/register" element={<RegisterPage />} />
+				<Route path="/editpro" element={<EditProfilePage />} />
+				<Route path="/appeal" element={<AppealPage />} />
+				{/* 無權限路由 */}
+				<Route path="/projects" element={<BrowseProjectPage />} />
+				<Route path="/info" element={<InfoPage />} />
+				{/* 管理員路由 */}
+				<Route path="/editann" element={<EditAnnouncementPage />} />
+				<Route path="/admin/editprofile/:ssn" element={<AdminEditProfilePage />} />
+				<Route path="/allusers" element={<UsersProfilePage/>}/>
+				<Route path="/adminappeal" element={<AdminAppealPage/>}/>
+				<Route path="/admin/browse" element={<AdminBrowsePage/>}/>
+				{/* 評審路由 */}
+				<Route path="/grade" element={<GradePage/>}/>
+				<Route path="/editgrade" element={<EditGradePage/>}/>
+				{/* 學生路由 */}
+				<Route path="/editpiece/:tid" element={<EditPiecePage/>}/>
+				<Route path="/teamreg" element={<TeamRegisterPage />} />
+				<Route path="/subpiece" element={<SubmitPiecePage />} />
+				<Route path="/teaminfo" element={<TeamInfoPage/>}/>
+				<Route path="/editteaminfo" element={<EditTeamInfoPage/>}/>
+				<Route path="/stufeedback" element={<StudentViewFeedbackPage/>}/>
+				{/* 指導老師路由 */}
+				<Route path="/guideteam" element={<GuideTeamPage/>}/>
+				{/* 其他路由(不存在的路由:顯示404 not found) */}
+				<Route path="*" element={<NotFoundPage />} />
 
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+				<Route path="/testback" element={<TestBack />} />
+			</Routes>
+		</UserProvider>
+	);
 }
-
-export default App
