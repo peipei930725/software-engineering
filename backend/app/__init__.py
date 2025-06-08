@@ -44,7 +44,8 @@ def create_app():
 
     from .team.register import team_bp
     app.register_blueprint(team_bp, url_prefix='/api')
-
+    from .team.edit import edit_bp
+    app.register_blueprint(edit_bp, url_prefix='/api/team')
 
     from .report.report import report_bp
     app.register_blueprint(report_bp, url_prefix='/api')

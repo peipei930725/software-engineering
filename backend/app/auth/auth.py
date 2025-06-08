@@ -238,3 +238,92 @@ def register():
     except Exception as e:
         current_app.logger.error(f"Register failed: {e}")
         return jsonify({'success':False,'message':'伺服器錯誤'}),500
+    
+
+@auth_api.route('/isstd', methods=['GET'])
+def is_student():
+    ssn = request.args.get('ssn')
+    if not ssn:
+        return jsonify({'success': False, 'message': '缺少 ssn'}), 400
+
+    sb = current_app.supabase
+
+    # 1) 檢查 student 表
+    try:
+        stu = (
+            sb
+            .from_('student')
+            .select('ssn')
+            .eq('ssn', ssn)
+            .maybe_single()
+            .execute()
+        )
+    except Exception as e:
+        current_app.logger.error(f"查 student 表例外：{e}")
+        return jsonify({'success': False, 'message': '伺服器錯誤'}), 500
+
+    if not stu.data:
+        return jsonify({'success': False, 'message': '不是學生或查無此人'}), 404
+
+    # 2) 取 user.name
+    try:
+        user = (
+            sb
+            .from_('user')
+            .select('name')
+            .eq('ssn', ssn)
+            .maybe_single()
+            .execute()
+        )
+    except Exception as e:
+        current_app.logger.error(f"查 user 表例外：{e}")
+        return jsonify({'success': False, 'message': '伺服器錯誤'}), 500
+
+    if not user.data:
+        return jsonify({'success': False, 'message': '不是學生或查無此人'}), 404
+
+    return jsonify({'success': True, 'username': user.data.get('name')}), 200
+
+@auth_api.route('/istc', methods=['GET'])
+def is_teacher():
+    ssn = request.args.get('ssn')
+    if not ssn:
+        return jsonify({'success': False, 'message': '缺少 ssn'}), 400
+
+    sb = current_app.supabase
+
+    # 1) 檢查 teacher 表
+    try:
+        tea = (
+            sb
+            .from_('teacher')
+            .select('ssn')
+            .eq('ssn', ssn)
+            .maybe_single()
+            .execute()
+        )
+    except Exception as e:
+        current_app.logger.error(f"查 teacher 表例外：{e}")
+        return jsonify({'success': False, 'message': '伺服器錯誤'}), 500
+
+    if not tea.data:
+        return jsonify({'success': False, 'message': '不是老師或查無此人'}), 404
+
+    # 2) 回 user.name
+    try:
+        user = (
+            sb
+            .from_('user')
+            .select('name')
+            .eq('ssn', ssn)
+            .maybe_single()
+            .execute()
+        )
+    except Exception as e:
+        current_app.logger.error(f"查 user 表例外：{e}")
+        return jsonify({'success': False, 'message': '伺服器錯誤'}), 500
+
+    if not user.data:
+        return jsonify({'success': False, 'message': '不是老師或查無此人'}), 404
+
+    return jsonify({'success': True, 'username': user.data.get('name')}), 200

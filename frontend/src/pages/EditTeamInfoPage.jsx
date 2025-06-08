@@ -19,15 +19,28 @@ const staticTeamInfo = {
 };
 
 // 共用 API 查詢
-async function fetchUserNameBySsn(ssn) {
+async function fetchStudentNameBySsn(ssn) {
   if (!ssn) return "";
   const res = await fetch(
-    `http://localhost:5000/api/user?ssn=${encodeURIComponent(ssn)}`,
+    `http://localhost:5000/api/isstd?ssn=${(ssn)}`,
     { credentials: "include" }
   );
   if (!res.ok) throw new Error("查無此身分證字號");
   const data = await res.json();
-  return data.name;
+  console.log("API 回傳資料：", data);
+  return data.username;
+}
+
+async function fetchTeacherNameBySsn(ssn) {
+  if (!ssn) return "";
+  const res = await fetch(
+    `http://localhost:5000/api/istc?ssn=${(ssn)}`,
+    { credentials: "include" }
+  );
+  if (!res.ok) throw new Error("查無此身分證字號");
+  const data = await res.json();
+  console.log("API 回傳資料：", data);
+  return data.username;
 }
 
 // reducer 處理 team 狀態
@@ -137,7 +150,7 @@ export default function EditTeamInfoPage() {
     dispatch({ type: "SET_TEACHER", ssn: newSsn, name: "" });
     if (!newSsn) return;
     try {
-      const name = await fetchUserNameBySsn(newSsn);
+      const name = await fetchTeacherNameBySsn(newSsn);
       dispatch({ type: "SET_TEACHER", ssn: newSsn, name });
     } catch {
       setTeacherError("查無此身分證字號");
@@ -151,7 +164,7 @@ export default function EditTeamInfoPage() {
     dispatch({ type: "SET_STUDENT", idx, payload: { ssn: newSsn, name: "" } });
     if (!newSsn) return;
     try {
-      const name = await fetchUserNameBySsn(newSsn);
+      const name = await fetchStudentNameBySsn(newSsn);
       dispatch({ type: "SET_STUDENT", idx, payload: { ssn: newSsn, name } });
     } catch {
       setStudentErrors((prev) => ({ ...prev, [idx]: "查無此身分證字號" }));
