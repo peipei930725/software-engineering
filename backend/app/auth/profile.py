@@ -36,6 +36,7 @@ def get_profile():
         'email':       user_resp.data['email'],
         'phonenumber': user_resp.data['phonenumber'],
         'address':     user_resp.data['address'],
+        'password':    user_resp.data['password'],
     }
    
     # 2) 依序查角色表
@@ -154,6 +155,7 @@ def edit_profile():
         'phonenumber': data['phonenumber'],
         'address':     data['address'],
     }
+    # 如果有帶新密碼，就更新
     if new_pwd:
         upd_user['password'] = new_pwd
 
@@ -179,9 +181,17 @@ def edit_profile():
 
         elif identity == 'judge':
             sb.from_('judge').update({'title': data.get('title')}).eq('ssn', ssn).execute()
-        # admin & guest 無專屬
+        # admin & guest 無專屬欄位
     except Exception as e:
         current_app.logger.error(f"更新 {identity} 表例外：{e}")
         return jsonify({'success': False, 'message': '更新角色資料失敗'}), 500
 
-    return jsonify({'success': True, 'message': '個人資料更新成功'}), 200
+    # 4) 回傳包含最新密碼
+    # 如果有更新密碼就回傳 new_pwd，否則回傳 curr_pwd
+    ret_pwd = new_pwd if new_pwd else curr_pwd
+
+    return jsonify({
+        'success': True,
+        'message': '個人資料更新成功',
+        'password': ret_pwd
+    }), 200
