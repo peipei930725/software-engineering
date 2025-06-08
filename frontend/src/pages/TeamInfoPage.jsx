@@ -126,6 +126,12 @@ function TeamInfoPage() {
                 >
                   修改作品
                 </button>
+                <button
+                  onClick={() => navigate("/stufeedback")}
+                  className="px-6 py-2 bg-[black] text-white rounded-lg font-bold hover:bg-[#126782] transition"
+                >
+                  查看評分與回饋
+                </button>            
               </div>
             </div>
           )}
