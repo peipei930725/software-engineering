@@ -21,6 +21,7 @@ import GradePage from "./pages/judge/GradePage.jsx";
 import EditGradePage from "./pages/judge/EditGradePage.jsx";
 import GuideTeamPage from "./pages/teacher/GuideTeamPage.jsx";
 import AdminAppealPage from "./pages/admin/AdminAppealPage.jsx";
+import EditTeamInfoPage from "./pages/EditTeamInfoPage.jsx";
 
 // App 主元件
 export default function App() {
@@ -49,6 +50,7 @@ export default function App() {
 				<Route path="/teamreg" element={<TeamRegisterPage />} />
 				<Route path="/subpiece" element={<SubmitPiecePage />} />
 				<Route path="/teaminfo" element={<TeamInfoPage/>}/>
+				<Route path="/editteaminfo" element={<EditTeamInfoPage/>}/>
 				{/* 指導老師路由 */}
 				<Route path="/guideteam" element={<GuideTeamPage/>}/>
 				{/* 其他路由(不存在的路由:顯示404 not found) */}
