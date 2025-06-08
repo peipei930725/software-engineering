@@ -17,7 +17,7 @@ def get_profile():
         user_resp = (
             sb
             .from_('user')
-            .select('name, email, phonenumber, address')
+            .select('name, email, phonenumber, address, password')
             .eq('ssn', ssn)
             .maybe_single()
             .execute()

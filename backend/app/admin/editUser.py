@@ -13,7 +13,7 @@ def edit_user():
     data = request.get_json() or {}
 
     # 必填檢查
-    for f in ('ssn', 'name', 'email', 'phonenumber', 'address', 'role'):
+    for f in ('ssn', 'name', 'email', 'phonenumber', 'address', 'role', 'password'):
         if not data.get(f):
             return jsonify({'success': False, 'message': f'{f} 為必填'}), 400
 
@@ -28,9 +28,8 @@ def edit_user():
         'email':       data['email'],
         'phonenumber': data['phonenumber'],
         'address':     data['address'],
+        'password':    data['password'],
     }
-    if new_pwd:
-        upd_user['password'] = new_pwd
 
     try:
         resp = sb.from_('user').update(upd_user).eq('ssn', ssn).execute()
