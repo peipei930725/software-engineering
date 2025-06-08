@@ -8,13 +8,12 @@ function AdminEditProfilePage() {
 	const { ssn } = useParams();
 	const navigate = useNavigate();
 	const { userInfo, isLoadingUser } = useUser();
+	const role = new URLSearchParams(useLocation().search).get("role");
 
 	const [profile, setProfile] = useState(null);
 	const [error, setError] = useState("");
 	const [msg, setMsg] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
-	const [newPassword, setNewPassword] = useState("");
-	const role = new URLSearchParams(useLocation().search).get("role");
 
 	useEffect(() => {
 		if (isLoadingUser) return;
@@ -26,10 +25,14 @@ function AdminEditProfilePage() {
 	useEffect(() => {
 		const fetchProfile = async () => {
 			try {
-				const res = await fetch(`http://localhost:5000/api/profile?ssn=${ssn}`, {
-					credentials: "include",
-				});
+				const res = await fetch(
+					`http://localhost:5000/api/profile?ssn=${ssn}`,
+					{
+						credentials: "include",
+					}
+				);
 				const data = await res.json();
+				console.log(data);
 				setProfile({ ...data, role });
 			} catch (err) {
 				console.error(err);
@@ -50,10 +53,13 @@ function AdminEditProfilePage() {
 		setMsg("");
 
 		try {
-			const body = { ...profile, role, ssn };
+			const body = {
+				...profile,
+				role,
+				ssn,
+				new_password: profile.password,
+			};
 			console.log(body);
-			if (newPassword) body.new_password = newPassword;
-
 			const res = await fetch("http://localhost:5000/api/admin/user", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
@@ -65,7 +71,7 @@ function AdminEditProfilePage() {
 				setError(result.msg || "更新失敗");
 			} else {
 				setMsg("更新成功");
-				setTimeout(() => navigate(-1), 2000);
+				setTimeout(() => navigate("/allusers"), 2000);
 			}
 		} catch (err) {
 			setError(`伺服器錯誤。${err.message}`);
@@ -104,40 +110,75 @@ function AdminEditProfilePage() {
 						修改使用者資料
 					</h2>
 					<form onSubmit={handleSubmit}>
-						<InputColumn label="姓名" name="name" value={profile.name} onChange={handleChange} />
-						<InputColumn label="Email" name="email" value={profile.email} onChange={handleChange} />
-						<InputColumn label="手機號碼" name="phonenumber" value={profile.phonenumber} onChange={handleChange} />
-						<InputColumn label="聯絡地址" name="address" value={profile.address} onChange={handleChange} />
+						<InputColumn
+							label="姓名"
+							name="name"
+							value={profile.name}
+							onChange={handleChange}
+						/>
+						<InputColumn
+							label="Email"
+							name="email"
+							value={profile.email}
+							onChange={handleChange}
+						/>
+						<InputColumn
+							label="手機號碼"
+							name="phonenumber"
+							value={profile.phonenumber}
+							onChange={handleChange}
+						/>
+						<InputColumn
+							label="聯絡地址"
+							name="address"
+							value={profile.address}
+							onChange={handleChange}
+						/>
 
 						{role === "student" && (
 							<>
-								<InputColumn label="系所" name="department" value={profile.department} onChange={handleChange} />
-								<InputColumn label="年級" name="grade" value={profile.grade} onChange={handleChange} />
-								<InputColumn label="學號" name="sid" value={profile.sid} onChange={handleChange} />
+								<InputColumn
+									label="系所"
+									name="department"
+									value={profile.department}
+									onChange={handleChange}
+								/>
+								<InputColumn
+									label="年級"
+									name="grade"
+									value={profile.grade}
+									onChange={handleChange}
+								/>
+								<InputColumn
+									label="學號"
+									name="sid"
+									value={profile.sid}
+									onChange={handleChange}
+								/>
 							</>
 						)}
 						{role === "teacher" && (
-							<InputColumn label="學歷" name="degree" value={profile.degree} onChange={handleChange} />
+							<InputColumn
+								label="學歷"
+								name="degree"
+								value={profile.degree}
+								onChange={handleChange}
+							/>
 						)}
 						{role === "judge" && (
-							<InputColumn label="頭銜" name="title" value={profile.title} onChange={handleChange} />
-						)}
-
-						<hr className="my-10 border-t-2 border-gray-200" />
-						<h3 className="text-xl font-bold mb-4 text-black text-center">
-							密碼重設（可選填）
-						</h3>
-						<div className="mb-4">
-							<label className="block mb-1 font-medium">新密碼</label>
-							<input
-								type="password"
-								name="new-password"
-								value={newPassword}
-								onChange={(e) => setNewPassword(e.target.value)}
-								placeholder="請輸入新密碼"
-								className="w-full px-3 py-2 border border-gray-300 rounded"
+							<InputColumn
+								label="頭銜"
+								name="title"
+								value={profile.title}
+								onChange={handleChange}
 							/>
-						</div>
+						)}
+						<InputColumn
+							label="密碼"
+							name="password"
+							value={profile.password}
+							onChange={handleChange}
+						/>
 
 						<button
 							type="submit"
