@@ -1,274 +1,424 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../contexts/UserContext";
 import Navbar from "../components/Navbar.jsx";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
+
+// 常量配置
+const API_BASE_URL = "http://localhost:5000/api";
+const REDIRECT_DELAY = 1200;
+const GRADE_OPTIONS = [1, 2, 3, 4];
 
 const STATIC_PROFILE = {
-  name: "王小明",
-  email: "test@example.com",
-  phonenumber: "0912345678",
-  address: "高雄市楠梓區高雄大學路700號",
-  department: "資訊工程學系",
-  grade: "3",
-  sid: "A1115500",
-  degree: "國立高雄大學電機工程學系博士",
-  title: "國立高雄大學校長",
-  identity: "guest",
+	name: "王小明",
+	email: "test@example.com",
+	phonenumber: "0912345678",
+	address: "高雄市楠梓區高雄大學路700號",
+	department: "資訊工程學系",
+	grade: "3",
+	sid: "A1115500",
+	degree: "國立高雄大學電機工程學系博士",
+	title: "國立高雄大學校長",
+	identity: "guest",
 };
 
+// 輸入字段組件
+const InputField = ({
+	label,
+	name,
+	value,
+	onChange,
+	type = "text",
+	required = true,
+	isLoading = false,
+}) => (
+	<div>
+		{isLoading ? (
+			<Skeleton
+				height={20}
+				width={80}
+				baseColor="#d9e3ec"
+				highlightColor="#f0f4f8"
+			/>
+		) : (
+			<label className="block mb-1 font-medium">{label}</label>
+		)}
+
+		{isLoading ? (
+			<Skeleton
+				height={35}
+				baseColor="#d9e3ec"
+				highlightColor="#f0f4f8"
+			/>
+		) : (
+			<input
+				type={type}
+				name={name}
+				value={value || ""}
+				onChange={onChange}
+				className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+				required={required}
+			/>
+		)}
+	</div>
+);
+
+// 選擇字段組件
+const SelectField = ({
+	label,
+	name,
+	value,
+	onChange,
+	options,
+	placeholder,
+	required = true,
+}) => (
+	<div>
+		<label className="block mb-1 font-medium">{label}</label>
+		<select
+			name={name}
+			value={value || ""}
+			onChange={onChange}
+			className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+			required={required}
+		>
+			<option value="" disabled>
+				{placeholder}
+			</option>
+			{options.map((option) => (
+				<option key={option} value={option}>
+					{option}
+				</option>
+			))}
+		</select>
+	</div>
+);
+
+// 消息顯示組件
+const Message = ({ message, type = "info" }) => {
+	const colorClasses = {
+		success: "text-green-600",
+		error: "text-red-500",
+		info: "text-blue-600",
+	};
+
+	return (
+		<div className={`text-center font-semibold ${colorClasses[type]}`}>
+			{message}
+		</div>
+	);
+};
+
+// 身份相關字段組件
+const IdentitySpecificFields = ({ identity, form, handleChange }) => {
+	switch (identity) {
+		case "student":
+			return (
+				<>
+					<InputField
+						label="系所"
+						name="department"
+						value={form.department}
+						onChange={handleChange}
+					/>
+					<SelectField
+						label="年級"
+						name="grade"
+						value={form.grade}
+						onChange={handleChange}
+						options={GRADE_OPTIONS}
+						placeholder="請選擇年級"
+					/>
+					<InputField
+						label="學號"
+						name="sid"
+						value={form.sid}
+						onChange={handleChange}
+					/>
+				</>
+			);
+		case "teacher":
+			return (
+				<InputField
+					label="學歷"
+					name="degree"
+					value={form.degree}
+					onChange={handleChange}
+				/>
+			);
+		case "judge":
+			return (
+				<InputField
+					label="頭銜"
+					name="title"
+					value={form.title}
+					onChange={handleChange}
+				/>
+			);
+		default:
+			return null;
+	}
+};
+
+// 主組件
 export default function EditProfilePage() {
-  const { userInfo, isLoadingUser } = useUser();
-  const [profile, setProfile] = useState(null);
-  const [form, setForm] = useState({});
-  const [msg, setMsg] = useState("");
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
+	const { userInfo, isLoadingUser } = useUser();
+	const navigate = useNavigate();
 
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
+	// 狀態管理
+	const [profile, setProfile] = useState(null);
+	const [form, setForm] = useState({});
+	const [passwords, setPasswords] = useState({
+		current: "",
+		new: "",
+	});
+	const [feedback, setFeedback] = useState({
+		message: "",
+		type: "",
+	});
+	const [isLoading, setIsLoading] = useState(false);
+	const [isLoadingProfile, setIsLoadingProfile] = useState(true);
 
-  useEffect(() => {
-    if (isLoadingUser) return;
-    if (!userInfo.isLoggedIn || !userInfo.ssn) {
-      navigate("/login");
-    }
-  }, [userInfo, isLoadingUser, navigate]);
+	// 清除反饋消息
+	const clearFeedback = useCallback(() => {
+		setFeedback({ message: "", type: "" });
+	}, []);
 
-  useEffect(() => {
-    fetch(`http://localhost:5000/api/profile?ssn=${encodeURIComponent(userInfo.ssn)}`, {
-      credentials: "include",
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("載入失敗");
-        return res.json();
-      })
-      .then((data) => {
-        setProfile(data);
-        setForm(data);
-      })
-      .catch(() => {
-        setError("後端連線失敗，顯示預設資料");
-        setProfile(STATIC_PROFILE);
-        setForm(STATIC_PROFILE);
-      });
-  }, [userInfo.ssn]);
+	// 設置反饋消息
+	const setFeedbackMessage = useCallback((message, type = "info") => {
+		setFeedback({ message, type });
+	}, []);
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+	// 檢查用戶認證
+	useEffect(() => {
+		if (isLoadingUser) return;
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setMsg("");
-    setError("");
-    setIsLoading(true);
+		if (!userInfo.isLoggedIn || !userInfo.ssn) {
+			navigate("/login");
+		}
+	}, [userInfo, isLoadingUser, navigate]);
 
-    if (!currentPassword) {
-      setError("請輸入當前密碼才能修改資料！");
-      setIsLoading(false);
-      return;
-    }
+	// 載入用戶資料
+	useEffect(() => {
+		if (!userInfo.ssn) return;
 
-    const body = {
-      ...form,
-      ssn: userInfo.ssn,
-      current_password: currentPassword,
-    };
-    if (newPassword) body.new_password = newPassword;
+		const loadProfile = async () => {
+			setIsLoadingProfile(true);
+			try {
+				const response = await fetch(
+					`${API_BASE_URL}/profile?ssn=${encodeURIComponent(
+						userInfo.ssn
+					)}`,
+					{ credentials: "include" }
+				);
 
-    try {
-      const res = await fetch("http://localhost:5000/api/edit_profile", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(body),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setError(data.message || "更新失敗");
-      } else {
-        setMsg(data.message || "更新成功");
-        setCurrentPassword("");
-        setNewPassword("");
-        setTimeout(() => navigate("/home"), 1200);
-      }
-    } catch {
-      setError("無法連接伺服器");
-    }
-    setIsLoading(false);
-  };
+				if (!response.ok) {
+					throw new Error(`HTTP error! status: ${response.status}`);
+				}
 
-  if (error && !profile) {
-    return (
-      <>
-        <Navbar />
-        <div className="bg-[#023047] text-white min-h-screen flex items-center justify-center">
-          {error}
-        </div>
-      </>
-    );
-  }
+				const data = await response.json();
+				setProfile(data);
+				setForm(data);
+				setFeedbackMessage("", "");
+			} catch (error) {
+				console.error("Profile loading error:", error);
+				setFeedbackMessage("後端連線失敗，顯示預設資料", "error");
+				setProfile(STATIC_PROFILE);
+				setForm(STATIC_PROFILE);
+			} finally {
+				setIsLoadingProfile(false);
+			}
+		};
 
-  if (!profile) {
-    return (
-      <>
-        <Navbar />
-        <div className="bg-[#023047] text-white min-h-screen flex items-center justify-center">
-          載入中...
-        </div>
-      </>
-    );
-  }
+		loadProfile();
+	}, [userInfo.ssn, setFeedbackMessage]);
 
-  return (
-    <>
-      <Navbar />
-      {/* 這裡加上 flex items-center justify-center 讓內容完全置中 */}
-      <div className="bg-[#023047] text-white pt-32 min-h-screen w-screen m-0 flex items-center justify-center">
-        <div className="bg-white text-black rounded-3xl shadow-2xl border border-white/30 p-8 md:p-12 w-full max-w-4xl">
-          <h2 className="text-2xl font-bold mb-6 text-center">修改個人資料</h2>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <InputColumn
-              label="姓名"
-              name="name"
-              value={form.name}
-              onChange={handleChange}
-            />
-            <InputColumn
-              label="E-mail"
-              name="email"
-              value={form.email}
-              onChange={handleChange}
-            />
-            <InputColumn
-              label="手機號碼"
-              name="phonenumber"
-              value={form.phonenumber}
-              onChange={handleChange}
-            />
-            <InputColumn
-              label="聯絡地址"
-              name="address"
-              value={form.address}
-              onChange={handleChange}
-            />
-            {form.identity === "student" && (
-              <>
-                <InputColumn
-                  label="系所"
-                  name="department"
-                  value={form.department}
-                  onChange={handleChange}
-                />
-                <div>
-                  <label className="block mb-1">年級</label>
-                  <select
-                    name="grade"
-                    value={form.grade}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded"
-                    required
-                  >
-                    <option value="" disabled>
-                      請選擇年級
-                    </option>
-                    {[1, 2, 3, 4].map((g) => (
-                      <option key={g} value={g}>
-                        {g}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <InputColumn
-                  label="學號"
-                  name="sid"
-                  value={form.sid}
-                  onChange={handleChange}
-                />
-              </>
-            )}
+	// 處理表單字段變更
+	const handleChange = useCallback((e) => {
+		const { name, value } = e.target;
+		setForm((prevForm) => ({ ...prevForm, [name]: value }));
+	}, []);
 
-            {form.identity === "teacher" && (
-              <InputColumn
-                label="學歷"
-                name="degree"
-                value={form.degree}
-                onChange={handleChange}
-              />
-            )}
+	// 處理密碼字段變更
+	const handlePasswordChange = useCallback(
+		(field) => (e) => {
+			setPasswords((prevPasswords) => ({
+				...prevPasswords,
+				[field]: e.target.value,
+			}));
+		},
+		[]
+	);
 
-            {form.identity === "judge" && (
-              <InputColumn
-                label="頭銜"
-                name="title"
-                value={form.title}
-                onChange={handleChange}
-              />
-            )}
+	// 驗證表單
+	const validateForm = () => {
+		if (!passwords.current.trim()) {
+			setFeedbackMessage("請輸入當前密碼才能修改資料！", "error");
+			return false;
+		}
+		return true;
+	};
 
-            <hr className="my-6 border-gray-200" />
+	// 處理表單提交
+	const handleSubmit = async (e) => {
+		e.preventDefault();
+		clearFeedback();
 
-            <div>
-              <label className="block mb-1">當前密碼（必填）</label>
-              <input
-                type="password"
-                name="current_password"
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded"
-                required
-              />
-            </div>
+		if (!validateForm()) {
+			return;
+		}
 
-            <div>
-              <label className="block mb-1">新密碼（選填）</label>
-              <input
-                type="password"
-                name="new_password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded"
-              />
-            </div>
+		setIsLoading(true);
 
-            {msg && (
-              <div className="text-green-600 text-center font-semibold">
-                {msg}
-              </div>
-            )}
-            {error && (
-              <div className="text-red-500 text-center font-semibold">
-                {error}
-              </div>
-            )}
+		try {
+			const requestBody = {
+				...form,
+				ssn: userInfo.ssn,
+				current_password: passwords.current,
+				...(passwords.new && { new_password: passwords.new }),
+			};
 
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full py-3 bg-green-500 text-white font-bold rounded hover:bg-green-600 disabled:opacity-50"
-            >
-              {isLoading ? "送出中..." : "確認修改"}
-            </button>
-          </form>
-        </div>
-      </div>
-    </>
-  );
-}
+			const response = await fetch(`${API_BASE_URL}/edit_profile`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				credentials: "include",
+				body: JSON.stringify(requestBody),
+			});
 
-function InputColumn({ label, name, value, onChange }) {
-  return (
-    <div>
-      <label className="block mb-1">{label}</label>
-      <input
-        type="text"
-        name={name}
-        value={value || ""}
-        onChange={onChange}
-        className="w-full px-3 py-2 border border-gray-300 rounded"
-        required
-      />
-    </div>
-  );
+			const data = await response.json();
+
+			if (!response.ok) {
+				setFeedbackMessage(data.message || "更新失敗", "error");
+			} else {
+				setFeedbackMessage(data.message || "更新成功", "success");
+				setPasswords({ current: "", new: "" });
+
+				// 延遲導航
+				setTimeout(() => navigate("/home"), REDIRECT_DELAY);
+			}
+		} catch (error) {
+			console.error("Submit error:", error);
+			setFeedbackMessage("無法連接伺服器", "error");
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	// 載入錯誤時的顯示
+	if (feedback.type === "error" && !profile) {
+		return (
+			<>
+				<Navbar />
+				<div className="bg-[#023047] text-white min-h-screen flex items-center justify-center">
+					<div className="text-center">
+						<h2 className="text-xl font-bold mb-4">載入失敗</h2>
+						<p>{feedback.message}</p>
+						<button
+							onClick={() => window.location.reload()}
+							className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+						>
+							重新載入
+						</button>
+					</div>
+				</div>
+			</>
+		);
+	}
+
+	return (
+		<>
+			<Navbar />
+			<div className="bg-[#023047] text-white pt-32 min-h-screen w-screen m-0 flex items-center justify-center">
+				<div className="bg-white text-black rounded-3xl shadow-2xl border border-white/30 p-8 md:p-12 w-full max-w-4xl">
+					<h2 className="text-2xl font-bold mb-6 text-center">
+						修改個人資料
+					</h2>
+
+					<form onSubmit={handleSubmit} className="space-y-4">
+						{/* 基本資料字段 */}
+						<InputField
+							label="姓名"
+							name="name"
+							value={form.name}
+							onChange={handleChange}
+							isLoading={isLoadingProfile}
+						/>
+
+						<InputField
+							label="E-mail"
+							name="email"
+							value={form.email}
+							onChange={handleChange}
+							type="email"
+							isLoading={isLoadingProfile}
+						/>
+
+						<InputField
+							label="手機號碼"
+							name="phonenumber"
+							value={form.phonenumber}
+							onChange={handleChange}
+							type="tel"
+							isLoading={isLoadingProfile}
+						/>
+
+						<InputField
+							label="聯絡地址"
+							name="address"
+							value={form.address}
+							onChange={handleChange}
+							isLoading={isLoadingProfile}
+						/>
+
+						{/* 身份相關字段 */}
+						{!isLoadingProfile && (
+							<IdentitySpecificFields
+								identity={form.identity}
+								form={form}
+								handleChange={handleChange}
+							/>
+						)}
+
+						<hr className="my-6 border-gray-200" />
+
+						{/* 密碼字段 */}
+						<InputField
+							label="當前密碼（必填）"
+							name="current_password"
+							value={passwords.current}
+							onChange={handlePasswordChange("current")}
+							type="password"
+						/>
+
+						<InputField
+							label="新密碼（選填）"
+							name="new_password"
+							value={passwords.new}
+							onChange={handlePasswordChange("new")}
+							type="password"
+							required={false}
+						/>
+
+						{/* 反饋消息 */}
+						{feedback.message && (
+							<Message
+								message={feedback.message}
+								type={feedback.type}
+							/>
+						)}
+
+						{/* 提交按鈕 */}
+						<button
+							type="submit"
+							disabled={isLoading || isLoadingProfile}
+							className="w-full py-3 bg-green-500 text-white font-bold rounded hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+						>
+							{isLoading ? "送出中..." : "確認修改"}
+						</button>
+					</form>
+				</div>
+			</div>
+		</>
+	);
 }
