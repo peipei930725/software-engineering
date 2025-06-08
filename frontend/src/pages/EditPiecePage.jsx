@@ -80,10 +80,10 @@ function EditPiecePage() {
       });
       const data = await res.json();
       if (res.ok) {
-        setMsg(data.msg || "作品資訊已修改！");
+        setMsg(data.message || "作品資訊已修改！");
         setTimeout(() => navigate("/home"), 1200);
       } else {
-        setError(data.msg || "修改失敗，請檢查資料。");
+        setError(data.message || "修改失敗，請檢查資料。");
       }
     } catch (err) {
       setError(`無法連接伺服器。${err}`);

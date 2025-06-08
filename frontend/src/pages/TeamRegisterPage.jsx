@@ -61,10 +61,10 @@ function TeamRegisterPage() {
       console.log(res);
       const data = await res.json();
       if (res.ok && data.success) {
-        setMsg(data.msg || "隊伍註冊成功！");
+        setMsg(data.message || "隊伍註冊成功！");
         setTimeout(() => navigate("/home"), 1500);
       } else {
-        setError(data.msg || "註冊失敗，請檢查資料。");
+        setError(data.message || "註冊失敗，請檢查資料。");
       }
     } catch (err) {
       setError(`無法連接伺服器。${err}`);

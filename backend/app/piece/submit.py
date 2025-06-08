@@ -46,7 +46,38 @@ def submit_piece():
         current_app.logger.error(f"查 student 失敗：{e}")
         return jsonify({'success': False, 'message': '伺服器錯誤(查隊伍編號)'}), 500
 
-    # 4) 查詢目前最大 pid，自增
+    # 4) 檢查該隊伍 (或該學生) 是否已經上傳過作品
+    try:
+        existing = (
+            sb
+            .from_('piece')
+            .select('pid')
+            .eq('tid', tid)
+            .limit(1)
+            .execute()
+        )
+        if existing.data:
+            print("已有上傳作品")
+            return jsonify({'success': False, 'message': '已有上傳作品'}), 400
+        
+    except Exception as e:
+        current_app.logger.error(f"檢查既有作品失敗：{e}")
+        return jsonify({'success': False, 'message': '伺服器錯誤(檢查既有作品)'}), 500
+    try:
+        dup = (
+            sb
+            .from_('piece')
+            .select('pid')
+            .eq('name', data['name'])
+            .limit(1)
+            .execute()
+        )
+        if dup.data:
+            return jsonify({'success': False, 'message': '作品名稱已被使用'}), 400
+    except Exception as e:
+        current_app.logger.error(f"檢查作品名稱重複失敗：{e}")
+        return jsonify({'success': False, 'message': '伺服器錯誤(檢查名稱)'}), 500
+    # 5) 查詢目前最大 pid，自行生成新 pid
     try:
         max_resp = (
             sb
@@ -63,7 +94,7 @@ def submit_piece():
         current_app.logger.error(f"查最大 pid 失敗：{e}")
         return jsonify({'success': False, 'message': '伺服器錯誤(計算 pid)'}), 500
 
-    # 5) 插入 piece
+    # 6) 插入 piece
     year = datetime.now().year
     payload = {
         'pid':      new_pid,
@@ -84,4 +115,8 @@ def submit_piece():
         current_app.logger.error(f"INSERT piece 失敗：{e}")
         return jsonify({'success': False, 'message': '伺服器錯誤(新增作品)'}), 500
 
-    return jsonify({'success': True, 'message': '作品繳交成功', 'pid': new_pid}), 201
+    return jsonify({
+        'success': True,
+        'message': '作品繳交成功',
+        'pid': new_pid
+    }), 201
