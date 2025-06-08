@@ -58,9 +58,9 @@ function UsersProfilePage() {
 				<header className="text-center">
 					<h2 className="text-3xl md:text-4xl font-bold">
 						所有 {fieldNameToLabel[identity]} 使用者資料
-						<span className="text-2xl">&nbsp;&nbsp;(請善用 </span>
+						<span className="text-2xl"> (使用 </span>
 						<span className="text-2xl text-red-600">Ctrl + F</span> 
-						<span className="text-2xl">)</span>
+						<span className="text-2xl"> 進行查詢)</span>
 					</h2>
 				</header>
 
