@@ -32,11 +32,12 @@ function EditPiecePage() {
   useEffect(() => {
     if (!pid) return;
     setIsLoading(true);
-    fetch(`http://localhost:5000/api/piece/${pid}`, {
+    fetch(`http://localhost:5000/api/piece?pid=${pid}`, {
       credentials: "include",
     })
       .then((res) => {
         if (!res.ok) throw new Error("找不到作品資料");
+        console
         return res.json();
       })
       .then((data) => {
@@ -72,7 +73,7 @@ function EditPiecePage() {
 
     setIsLoading(true);
     try {
-      const res = await fetch(`http://localhost:5000/api/piece/${pid}`, {
+      const res = await fetch(`http://localhost:5000/api/piece?pid=${pid}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

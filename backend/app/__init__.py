@@ -41,6 +41,8 @@ def create_app():
     from .getdata.announcement import announcement_bp
     app.register_blueprint(announcement_bp, url_prefix='/api')
 
+    from .getdata.piece import detail_bp
+    app.register_blueprint(detail_bp)
 
     from .team.register import team_bp
     app.register_blueprint(team_bp, url_prefix='/api')
