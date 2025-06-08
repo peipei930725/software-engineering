@@ -57,7 +57,6 @@ function AdminEditProfilePage() {
 				...profile,
 				role,
 				ssn,
-				new_password: profile.password,
 			};
 			console.log(body);
 			const res = await fetch("http://localhost:5000/api/admin/user", {
