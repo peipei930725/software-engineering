@@ -12,6 +12,8 @@ def get_announcements():
 
     try:
         sb = current_app.supabase
+
+        # 1. 讀 announcement
         resp = (
             sb
             .from_('announcement')
@@ -23,19 +25,37 @@ def get_announcements():
 
         result = []
         for r in rows:
+            # 2. 針對每筆，用 ssn 查 user table 拿 name
+            admin_ssn = r.get('ssn')
+            try:
+                user_resp = (
+                    sb
+                    .from_('user')
+                    .select('name')
+                    .eq('ssn', admin_ssn)
+                    .maybe_single()
+                    .execute()
+                )
+                admin_name = user_resp.data.get('name') if user_resp and user_resp.data else ''
+            except Exception:
+                admin_name = 'error'
+
+            # 3. 處理時間格式
             raw = r.get('TIMESTAMP')
             try:
                 dt = datetime.fromisoformat(raw.rstrip('Z'))
                 dtstr = dt.isoformat(sep='T')[:16]
             except:
                 dtstr = raw or ''
+
             result.append({
                 'aid':        r.get('aid'),
-                'admin_ssn':  r.get('ssn'),
+                'admin_name': admin_name,    # 回傳管理員姓名
                 'title':      r.get('title'),
                 'context':    r.get('content'),
                 'datetime':   dtstr
             })
+
         return jsonify(result), 200
 
     except Exception as e:
@@ -56,7 +76,7 @@ def create_announcement():
     try:
         sb = current_app.supabase
 
-        # 1. 檢查 admin_ssn 必須存在於 admin table
+        # 1. 檢查 admin 存在
         check_admin = (
             sb
             .from_('admin')
@@ -67,7 +87,7 @@ def create_announcement():
         if not check_admin.data:
             return jsonify({'success': False, 'message': '管理員 SSN 不存在'}), 400
 
-        # 2. 檢查 aid 是否重複
+        # 2. 檢查 aid 重複
         chk = (
             sb
             .from_('announcement')
@@ -78,7 +98,7 @@ def create_announcement():
         if chk.data:
             return jsonify({'success': False, 'message': '公告編號已存在'}), 409
 
-        # 3. 組 payload，包含 TIMESTAMP 欄位
+        # 3. 插入
         payload = {
             'aid':       int(data['aid']),
             'ssn':       data['admin_ssn'],

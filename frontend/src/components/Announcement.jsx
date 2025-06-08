@@ -61,7 +61,7 @@ function Announcement() {
 				: announcements.map((item) => (
 						<AnnouncementComponent
 							key={item.aid}
-							adminSSN={item.admin_ssn}
+							adminSSN={item.admin_name}
 							aid={item.aid}
 							context={item.context}
 							datetime={item.datetime}
