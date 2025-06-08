@@ -15,32 +15,25 @@ def edit_user():
     # 必填檢查
     for f in ('ssn', 'name', 'email', 'phonenumber', 'address', 'role'):
         if not data.get(f):
-            print(f"Missing required field: {f}")
             return jsonify({'success': False, 'message': f'{f} 為必填'}), 400
 
-    ssn       = data['ssn']
-    name      = data['name']
-    email     = data['email']
-    phone     = data['phonenumber']
-    address   = data['address']
-    role      = data['role']
-    new_pwd   = data.get('new-password')
+    ssn     = data['ssn']
+    new_pwd = data.get('new-password')
 
     sb = current_app.supabase
 
     # 1) 更新 user 基本資料
     upd_user = {
-        'name':        name,
-        'email':       email,
-        'phonenumber': phone,
-        'address':     address,
+        'name':        data['name'],
+        'email':       data['email'],
+        'phonenumber': data['phonenumber'],
+        'address':     data['address'],
     }
     if new_pwd:
         upd_user['password'] = new_pwd
 
     try:
         resp = sb.from_('user').update(upd_user).eq('ssn', ssn).execute()
-        # Supabase insert/update 若成功，.data 會是列表，若無則視為失敗
         if not resp.data:
             return jsonify({'success': False, 'message': '更新基本資料失敗'}), 500
     except Exception as e:
@@ -49,8 +42,8 @@ def edit_user():
 
     # 2) 更新角色專屬欄位
     try:
+        role = data['role']
         if role == 'student':
-            # 檢查必填
             for f in ('department','grade','sid'):
                 if not data.get(f):
                     return jsonify({'success': False, 'message': f'{f} 為必填(學生)'}), 400
@@ -79,12 +72,14 @@ def edit_user():
             if not r.data:
                 raise Exception('judge table update failed')
 
-        else:
-            # admin 無額外欄位，或可更新 admin table
-            pass
-
+        # admin 或其他角色暫不含專屬欄位
     except Exception as e:
         current_app.logger.error(f"更新 {role} table 失敗：{e}")
         return jsonify({'success': False, 'message': f'伺服器錯誤（{role}）'}), 500
-
-    return jsonify({'success': True, 'message': '使用者資料更新成功'}), 200
+    
+    # 回傳結果，包含最新的密碼（若使用者有更新密碼則為新密碼，否則仍回傳原密碼）
+    return jsonify({
+        'success':  True,
+        'message':  '使用者資料更新成功',
+        'password': new_pwd or resp.data[0].get('password')
+    }), 200
