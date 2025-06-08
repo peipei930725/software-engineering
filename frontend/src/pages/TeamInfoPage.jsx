@@ -109,7 +109,7 @@ function TeamInfoPage() {
               <h3 className="text-xl font-bold mb-4 text-[black]">功能選單</h3>
               <div className="flex flex-wrap gap-4">
                 <button
-                  onClick={() => navigate("/editinfo")}
+                  onClick={() => navigate("/editteaminfo")}
                   className="px-6 py-2 bg-[black] text-white rounded-lg font-bold hover:bg-[#126782] transition"
                 >
                   修改隊伍資料

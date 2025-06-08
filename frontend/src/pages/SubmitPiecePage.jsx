@@ -49,7 +49,7 @@ function SubmitPiecePage() {
 
     setIsLoading(true);
     try {
-      const res = await fetch("http://localhost:5000/api/piece/submit", {
+      const res = await fetch(`http://localhost:5000/api/piece/submit?ssn=${encodeURIComponent(userInfo.ssn)}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -57,10 +57,10 @@ function SubmitPiecePage() {
       });
       const data = await res.json();
       if (res.ok) {
-        setMsg(data.msg || "作品已成功繳交！");
+        setMsg(data.message|| "作品已成功繳交！");
         setTimeout(() => window.history.back(), 1200);
       } else {
-        setError(data.msg || "繳交失敗，請檢查資料。");
+        setError(data.message || "繳交失敗，請檢查資料。");
       }
     } catch (err) {
       setError(`無法連接伺服器。${err}`);
