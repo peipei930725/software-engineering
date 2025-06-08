@@ -30,7 +30,7 @@ function Navbar() {
 			admin: [
 				{ to: "/adminappeal", label: "申訴接收" },
 				{ to: "/editann", label: "公告編輯" },
-				{ to: "", label: "查詢資料" },
+				{ to: "/admin/browse", label: "查詢資料" },
 				{ to: "/allusers", label: "編輯成員" },
 			],
 			judge: [

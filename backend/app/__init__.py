@@ -44,6 +44,7 @@ def create_app():
 
     from .team.register import team_bp
     app.register_blueprint(team_bp, url_prefix='/api')
+    
     from .team.edit import edit_bp
     app.register_blueprint(edit_bp, url_prefix='/api/team')
 
@@ -52,6 +53,9 @@ def create_app():
     
     from .admin.allUser import alluser_bp
     app.register_blueprint(alluser_bp, url_prefix='/api/admin')
+
+    from .admin.allteams import allteams_bp
+    app.register_blueprint(allteams_bp, url_prefix='/api/admin')
 
     from .admin.editUser import admin_bp
     app.register_blueprint(admin_bp, url_prefix='/api/admin')

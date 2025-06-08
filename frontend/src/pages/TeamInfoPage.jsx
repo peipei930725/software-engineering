@@ -27,24 +27,35 @@ function TeamInfoPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (isLoadingUser) return;
+  if (isLoadingUser) return;
+
+  const fetchTeamInfo = async () => {
     if (!userInfo.isLoggedIn || userInfo.role !== "student") {
       navigate("/login");
       return;
     }
-    fetch(`http://localhost:5000/api/team/info?ssn=${encodeURIComponent(userInfo.ssn)}`, {
-      credentials: "include",
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("未找到相關隊伍資料");
-        return res.json();
-      })
-      .then(setTeamInfo)
-      .catch((err) => {
-        setError(`後端連線失敗，顯示預設資料。${err}`);
-        setTeamInfo(staticTeamInfo);
-      });
-  }, [userInfo, isLoadingUser, navigate]);
+    try {
+      const res = await fetch(
+        `http://localhost:5000/api/team/info?ssn=${encodeURIComponent(userInfo.ssn)}`,
+        {
+          credentials: "include",
+        }
+      );
+
+      if (!res.ok) throw new Error("未找到相關隊伍資料");
+
+      const data = await res.json();
+      console.log(data);
+      setTeamInfo(data);
+    } catch (err) {
+      setError(`後端連線失敗，顯示預設資料。${err}`);
+      setTeamInfo(staticTeamInfo);
+    }
+  };
+
+  fetchTeamInfo();
+}, [userInfo, isLoadingUser, navigate]);
+
 
   const loading = !teamInfo;
 

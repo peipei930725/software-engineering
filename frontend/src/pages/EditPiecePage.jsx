@@ -7,6 +7,7 @@ function EditPiecePage() {
   const { userInfo, isLoadingUser } = useUser();
   const navigate = useNavigate();
   const { pid } = useParams(); // 作品ID從路由取得
+  console.log(pid);
 
   const [form, setForm] = useState({
     tid: "",
@@ -30,29 +31,36 @@ function EditPiecePage() {
 
   // 載入現有作品資料
   useEffect(() => {
-    if (!pid) return;
+  if (!pid) return;
+
+  const fetchPiece = async () => {
     setIsLoading(true);
-    fetch(`http://localhost:5000/api/piece/${pid}`, {
-      credentials: "include",
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("找不到作品資料");
-        return res.json();
-      })
-      .then((data) => {
-        setForm({
-          tid: data.tid,
-          name: data.name,
-          demo: data.demo,
-          poster: data.poster,
-          code: data.code,
-          document: data.document,
-        });
-        setError("");
-      })
-      .catch((err) => setError("載入作品失敗：" + err.message))
-      .finally(() => setIsLoading(false));
-  }, [pid]);
+    try {
+      const res = await fetch(`http://localhost:5000/api/piece/${pid}`, {
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error("找不到作品資料");
+
+      const data = await res.json();
+      setForm({
+        tid: data.tid,
+        name: data.name,
+        demo: data.demo,
+        poster: data.poster,
+        code: data.code,
+        document: data.document,
+      });
+      setError("");
+    } catch (err) {
+      setError(`載入作品失敗：${err}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  fetchPiece();
+}, [pid]);
+
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
