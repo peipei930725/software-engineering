@@ -81,7 +81,7 @@ function EditPiecePage() {
       const data = await res.json();
       if (res.ok) {
         setMsg(data.msg || "作品資訊已修改！");
-        setTimeout(() => navigate("/console"), 1200);
+        setTimeout(() => navigate("/home"), 1200);
       } else {
         setError(data.msg || "修改失敗，請檢查資料。");
       }
