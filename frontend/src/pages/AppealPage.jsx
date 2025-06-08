@@ -42,6 +42,9 @@ function AppealPage() {
 			if (res.ok) {
 				setMessage("申訴已送出，謝謝您的填寫！");
 				setForm({ id: "", content: "" });
+				setTimeout(() => {
+					navigate("/home");
+				}, 1200);
 			} else {
 				setMessage(data.message || "送出失敗，請稍後再試。");
 			}
