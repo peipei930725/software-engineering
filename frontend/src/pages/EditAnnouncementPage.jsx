@@ -226,7 +226,7 @@ function EditAnnouncementPage() {
               <button
                 type="button"
                 onClick={handleNow}
-                className="ml-2 px-3 py-2 bg-white text-blue-700 rounded-lg border border-blue-300 hover:bg-blue-50 transition"
+                className="ml-2 px-3 py-2 bg-white text-white rounded-lg border border-blue-300 hover:bg-blue-50 transition"
                 title="立即填入現在時間"
               >
                 現在
@@ -267,7 +267,7 @@ function EditAnnouncementPage() {
                         value={editForm.title}
                         onChange={handleEditChange}
                         required
-                        className="px-3 py-2 border border-gray-300 rounded"
+                        className="px-3 py-2 border border-gray-300 rounded text-black"
                       />
                       <textarea
                         name="context"
@@ -275,7 +275,7 @@ function EditAnnouncementPage() {
                         onChange={handleEditChange}
                         required
                         rows={3}
-                        className="px-3 py-2 border border-gray-300 rounded"
+                        className="px-3 py-2 border border-gray-300 rounded text-black"
                       />
                       <input
                         type="datetime-local"
@@ -283,7 +283,7 @@ function EditAnnouncementPage() {
                         value={editForm.datetime}
                         onChange={handleEditChange}
                         required
-                        className="px-3 py-2 border border-gray-300 rounded"
+                        className="px-3 py-2 border border-gray-300 rounded text-black"
                       />
                       <div className="flex gap-3 mt-2">
                         <button
@@ -296,7 +296,7 @@ function EditAnnouncementPage() {
                         <button
                           type="button"
                           onClick={() => setEditAid(null)}
-                          className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 font-semibold"
+                          className="px-4 py-2 bg-black text-white rounded hover:bg-black-400 font-semibold"
                         >
                           取消
                         </button>
