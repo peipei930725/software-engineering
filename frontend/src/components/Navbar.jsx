@@ -43,7 +43,7 @@ function Navbar() {
 				...commonItems,
 				{ to: "/projects", label: "歷屆作品" },
 				{ to: "/appeal", label: "申訴系統" },
-				{ to: "", label: "指導隊伍" },
+				{ to: "/guideteam", label: "指導隊伍" },
 			],
 		};
 
