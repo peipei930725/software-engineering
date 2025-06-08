@@ -32,7 +32,7 @@ function TeamInfoPage() {
       navigate("/login");
       return;
     }
-    fetch("http://localhost:5000/api/team/info", {
+    fetch(`http://localhost:5000/api/team/info?ssn=${encodeURIComponent(userInfo.ssn)}`, {
       credentials: "include",
     })
       .then((res) => {
