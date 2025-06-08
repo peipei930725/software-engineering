@@ -40,10 +40,7 @@ def create_app():
 
     from .getdata.announcement import announcement_bp
     app.register_blueprint(announcement_bp, url_prefix='/api')
-
-    from .getdata.piece import detail_bp
-    app.register_blueprint(detail_bp)
-
+    
     from .team.register import team_bp
     app.register_blueprint(team_bp, url_prefix='/api')
     
@@ -74,6 +71,13 @@ def create_app():
     from .piece.submit import piece_bp
     app.register_blueprint(piece_bp, url_prefix='/api/piece')
     
+    from app.getdata.piece import piece_bp
+    app.register_blueprint(piece_bp)
+
+    from app.piece.edit import edit_bp
+    app.register_blueprint(edit_bp)
+
+
     # 將 supabase 客戶端掛載到 app（若需要 global 存取）
     app.supabase = supabase
 

@@ -80,7 +80,7 @@ function EditPiecePage() {
 
     setIsLoading(true);
     try {
-      const res = await fetch(`http://localhost:5000/api/piece?tid=${tid}`, {
+      const res = await fetch(`http://localhost:5000/api/edit_piece/tid=${tid}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

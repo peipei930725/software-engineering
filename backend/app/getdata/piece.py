@@ -1,17 +1,16 @@
-# app/getdata/piece_detail.py
+# app/getdata/piece.py
 from flask import Blueprint, request, jsonify, current_app
 
-# 路由前綴不加 /submit，就跟 submit、projects 分開
-detail_bp = Blueprint('piece_detail_bp', __name__, url_prefix='/api/piece')
+piece_bp = Blueprint('get_piece_bp', __name__, url_prefix='/api/piece')
 
-@detail_bp.route('', methods=['GET'])
-def get_piece_detail():
-    # 1) 取 pid
-    pid = request.args.get('pid', type=int)
-    if not pid:
-        return jsonify({'success': False, 'message': '缺少 pid'}), 400
-
+@piece_bp.route('/<int:pid>', methods=['GET'])
+def get_piece_by_pid(pid):
+    """
+    GET /api/piece/<pid>
+    根據 pid 查單一作品
+    """
     sb = current_app.supabase
+
     try:
         resp = (
             sb
@@ -22,12 +21,14 @@ def get_piece_detail():
             .execute()
         )
     except Exception as e:
-        current_app.logger.error(f"查 piece 例外：{e}")
+        print(f"查 piece 例外 (pid={pid})：{e}")
         return jsonify({'success': False, 'message': '伺服器錯誤'}), 500
 
-    # 2) 找不到
-    if not resp.data:
+    # 如果 resp.data 是 None，表示沒找到
+    if resp.data is None:
+        print(f"找不到 pid={pid} 的作品")
         return jsonify({'success': False, 'message': '找不到該作品'}), 404
 
-    # 3) 回傳單筆作品資料
-    return jsonify(resp.data), 200
+    # 正常回傳
+    print(f"成功查到 pid={resp.data} 的作品")
+    return jsonify({'success': True, 'data': resp.data}), 200
