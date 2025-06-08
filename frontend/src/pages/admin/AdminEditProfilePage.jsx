@@ -38,7 +38,7 @@ function AdminEditProfilePage() {
 	}, [userInfo, isLoadingUser]);
 
 	useEffect(() => {
-		fetch(`/api/profile/${ssn}`, {
+		fetch(`http://localhost:5050/api/profile/${ssn}`, {
 			credentials: "include",
 		})
 			.then((res) => res.json())
@@ -63,7 +63,7 @@ function AdminEditProfilePage() {
 			const body = { ...profile };
 			if (newPassword) body.new_password = newPassword;
 
-			const res = await fetch("/api/admin/user", {
+			const res = await fetch("http://localhost:5000/api/admin/user", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				credentials: "include",

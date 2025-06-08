@@ -8,7 +8,7 @@ function LoginPage() {
 	const [error, setError] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 
-	const { userInfo, setUserInfo, fetchUserInfo } = useUser(); // 添加 fetchUserInfo
+	const { userInfo, fetchUserInfo } = useUser(); // 添加 fetchUserInfo
 	const navigate = useNavigate();
 
 	useEffect(() => {
@@ -41,14 +41,14 @@ function LoginPage() {
 			console.log(data.role);
 
 			if (response.ok && (data.message === "登入成功")) {
-				
+				fetchUserInfo(); // 獲取用戶資訊，更新上下文狀態
 					// 或者直接設置從登入 API 返回的用戶資訊
-					setUserInfo({
-						isLoggedIn: true,
-						username: data.data.name,
-						role: data.data.role,
-						ssn: data.data.ssn
-					});
+					// setUserInfo({
+					// 	isLoggedIn: true,
+					// 	username: data.data.name,
+					// 	role: data.data.role,
+					// 	ssn: data.data.ssn
+					// });
 				
 				navigate("/home");
 			} else {
