@@ -22,7 +22,7 @@ function AdminAppealPage() {
   useEffect(() => {
     if (!userInfo.isLoggedIn || userInfo.role !== "admin") return;
     setLoading(true);
-    fetch("http://localhost:5000/api/appeals", {
+    fetch("http://localhost:5000/api/admin/appeals", {
       credentials: "include",
     })
       .then((res) => {
