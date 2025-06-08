@@ -35,7 +35,7 @@ function EditProfilePage() {
   }, [userInfo, isLoadingUser, navigate]);
 
   useEffect(() => {
-    fetch(`/api/profile?ssn=${encodeURIComponent(userInfo.username)}`, {
+    fetch(`http://localhost:5000/api/profile?ssn=${encodeURIComponent(userInfo.ssn)}`, {
       credentials: 'include'
     })
       .then(res => {
@@ -94,7 +94,7 @@ function EditProfilePage() {
     }
 
     try {
-      const res = await fetch("/api/profile", {
+      const res = await fetch("http://localhost:5000/api/edit_profile", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: 'include',
