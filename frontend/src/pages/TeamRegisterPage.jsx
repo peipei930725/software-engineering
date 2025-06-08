@@ -46,8 +46,8 @@ function TeamRegisterPage() {
     setError("");
 
     // 基本必填欄位驗證
-    if (!form.name || !form.student1_id || !form.student2_id) {
-      setError("隊伍名稱、學生1和學生2的身分證字號為必填！");
+    if (!form.name || !form.student1_id || !form.student2_id || !form.professor_id) {
+      setError("隊伍名稱、學生1和學生2、指導老師的身分證字號為必填！");
       return;
     }
 
@@ -155,6 +155,7 @@ function TeamRegisterPage() {
             name="professor_id"
             value={form.professor_id}
             onChange={handleChange}
+            required
           />
           <button
             type="submit"
