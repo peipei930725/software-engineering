@@ -21,5 +21,5 @@ def get_all_pieces_for_judge():
         )
         return jsonify({"success": True, "pieces": resp.data})
     except Exception as e:
-        current_app.logger.error(f"[JUDGE] 查詢作品失敗：{e}")
+        print(f"[JUDGE] 查詢作品失敗：{e}")
         return jsonify({"success": False, "message": "伺服器錯誤"}), 500

@@ -21,7 +21,7 @@ function GradePage() {
       navigate("/login");
       return;
     }
-    fetch("http://localhost:5000/api/judge/pieces", { credentials: "include" })
+    fetch(`http://localhost:5000/api/judge/pieces?ssn=${encodeURIComponent(userInfo.ssn)}`, { credentials: "include" })
       .then((res) => {
         if (!res.ok) throw new Error("無法取得作品資料");
         return res.json();
@@ -45,7 +45,7 @@ function GradePage() {
       return;
     }
     setLoading(true);
-    fetch("http://localhost:5000/api/judge/score", {
+    fetch(`http://localhost:5000/api/judge/score?ssn=${encodeURIComponent(userInfo.ssn)}`, {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
