@@ -26,7 +26,10 @@ function GradePage() {
         if (!res.ok) throw new Error("無法取得作品資料");
         return res.json();
       })
-      .then(setPieces)
+      .then((data) => {
+        console.log("取得作品資料：", data);  
+        setPieces(data.pieces || []);
+      })
       .catch(() => setStatus("無法取得作品資料，請稍後再試"));
   }, [userInfo, isLoadingUser, navigate]);
 
@@ -47,7 +50,7 @@ function GradePage() {
       credentials: "include",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        pid: selectedPid,
+        pid: selectedPiece.pid,
         score: Number(score),
         comment,
       }),
