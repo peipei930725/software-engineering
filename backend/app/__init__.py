@@ -85,9 +85,12 @@ def create_app():
 
     from .judge.score import score_bp
     app.register_blueprint(score_bp, url_prefix='/api/judge')
-    
+
     from app.judge.score_manage import judge_bp
     app.register_blueprint(judge_bp)
+    
+    from app.team.teacher import teacher_bp
+    app.register_blueprint(teacher_bp)
 
     # 將 supabase 客戶端掛載到 app（若需要 global 存取）
     app.supabase = supabase

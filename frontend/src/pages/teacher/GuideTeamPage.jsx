@@ -121,7 +121,7 @@ function GudieTeamPage() {
     setPiecesMap({});
     if (!teams || teams.length === 0) return;
     teams.forEach((team) => {
-      fetch(`http://localhost:5000/api/piece?tid=${team.tid}`, {
+      fetch(`http://localhost:5000/api/piece/${team.tid}`, {
         credentials: "include",
       })
         .then((res) => {
