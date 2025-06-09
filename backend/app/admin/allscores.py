@@ -13,8 +13,9 @@ def get_allscores():
         response = (
             sb
             .table('team_view')
-            .select('judgename, title, name, score, year')
+            .select('judgename, title, name, score, year') # 評審名字、評審頭銜、作品名稱、分數、作品年份
             .not_.is_('score', 'null')
+            .order('year', desc=True)
             .order('name', desc=False)
             .execute()
         )

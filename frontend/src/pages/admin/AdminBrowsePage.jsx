@@ -17,6 +17,23 @@ const identityApiMap = {
     piece: "http://localhost:5000/api/admin/table/pieces",
 };
 
+const columnLabelMap = {
+    team: {
+        name: "隊伍名稱",
+        rank: "排名",
+        teacher_ssn: "指導老師身分證",
+        tid: "隊伍編號",
+        year: "年份",
+    },
+    piece: {
+        judgename: "評審名字",
+        name: "作品名稱",
+        score: "分數",
+        title: "評審頭銜",
+        year: "作品年份",
+    },
+};
+
 export default function AdminBrowsePage() {
     const { userInfo, isLoadingUser } = useUser();
     const navigate = useNavigate();
@@ -96,7 +113,7 @@ export default function AdminBrowsePage() {
                         type="text"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        placeholder="搜尋關鍵字..."
+                        placeholder="搜尋..."
                         className="mb-4 w-full px-3 py-2 border border-gray-300 rounded"
                     />
 
@@ -115,7 +132,7 @@ export default function AdminBrowsePage() {
                                                 key={col}
                                                 className="border px-3 py-2 bg-blue-600 text-white font-semibold"
                                             >
-                                                {col}
+                                                {columnLabelMap[identity]?.[col] || col}
                                             </th>
                                         ))}
                                     </tr>

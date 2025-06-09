@@ -14,7 +14,7 @@ def get_allteams():
             sb
             .table('team')
             .select('*')
-            .order('name', desc=False)
+            .order('tid', desc=False)
             .execute()
         )
 
