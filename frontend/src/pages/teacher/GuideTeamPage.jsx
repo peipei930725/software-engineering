@@ -3,90 +3,13 @@ import { useUser } from "../../contexts/UserContext";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar.jsx";
 
-// 靜態隊伍資料
-const staticTeamsByYear = {
-  2023: [
-    {
-      tid: "T2023",
-      name: "未來之星",
-      year: 2023,
-      rank: 2,
-      students: [
-        { name: "張偉", sid: "S1001", department: "資訊工程", grade: 3 },
-        { name: "林芳", sid: "S1002", department: "資訊工程", grade: 2 },
-      ],
-    },
-  ],
-  2024: [
-    {
-      tid: "T2024",
-      name: "創新夢想隊",
-      year: 2024,
-      rank: 1,
-      students: [
-        { name: "陳志明", sid: "S2001", department: "電機工程", grade: 4 },
-        { name: "李玉", sid: "S2002", department: "資訊管理", grade: 2 },
-      ],
-    },
-  ],
-  2025: [
-    {
-      tid: "T2025",
-      name: "資工之星",
-      year: 2025,
-      rank: null,
-      students: [
-        { name: "王小明", sid: "S3001", department: "資訊工程", grade: 3 },
-        { name: "李小美", sid: "S3002", department: "資訊工程", grade: 2 },
-      ],
-    },
-  ],
-};
-
-// 靜態作品資料
-const staticPiecesByTid = {
-  T2023: [
-    {
-      pid: 101,
-      tid: "T2023",
-      name: "智慧農業監控系統",
-      demo: "https://demo.example.com/agri2023",
-      poster: "https://poster.example.com/agri2023.jpg",
-      code: "https://github.com/team2023/agri",
-      document: "https://docs.example.com/agri2023.pdf",
-    },
-  ],
-  T2024: [
-    {
-      pid: 201,
-      tid: "T2024",
-      name: "AI 語音助理",
-      demo: "https://demo.example.com/ai2024",
-      poster: "https://poster.example.com/ai2024.jpg",
-      code: "https://github.com/team2024/ai",
-      document: "https://docs.example.com/ai2024.pdf",
-    },
-  ],
-  T2025: [
-    {
-      pid: 301,
-      tid: "T2025",
-      name: "自駕車模擬系統",
-      demo: "https://demo.example.com/car2025",
-      poster: "https://poster.example.com/car2025.jpg",
-      code: "https://github.com/team2025/car",
-      document: "https://docs.example.com/car2025.pdf",
-    },
-  ],
-};
-
 const availableYears = [2023, 2024, 2025];
 
 function GudieTeamPage() {
   const { userInfo, isLoadingUser } = useUser();
   const navigate = useNavigate();
 
-  const [teams, setTeams] = useState(staticTeamsByYear[2025]);
+  const [teams, setTeams] = useState([]);
   const [error, setError] = useState("");
   const [selectedYear, setSelectedYear] = useState(2025);
   const [piecesMap, setPiecesMap] = useState({}); // { [tid]: [piece, ...] }
@@ -111,8 +34,8 @@ function GudieTeamPage() {
         setError("");
       })
       .catch((err) => {
-        setError(err.message + "，已載入靜態資料。");
-        setTeams(staticTeamsByYear[selectedYear] || []);
+        setError(err.message);
+        setTeams([]);
       });
   }, [userInfo, isLoadingUser, navigate, selectedYear]);
 
@@ -135,10 +58,10 @@ function GudieTeamPage() {
           }));
         })
         .catch(() => {
-          // fetch 失敗時載入靜態資料
+          // fetch 失敗時設為空陣列
           setPiecesMap((prev) => ({
             ...prev,
-            [team.tid]: staticPiecesByTid[team.tid] || [],
+            [team.tid]: [],
           }));
         });
     });
