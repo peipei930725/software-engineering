@@ -21,12 +21,15 @@ function GradePage() {
       navigate("/login");
       return;
     }
-    fetch("http://localhost:5000/api/judge/pieces", { credentials: "include" })
+    fetch(`http://localhost:5000/api/judge/pieces?ssn=${encodeURIComponent(userInfo.ssn)}`, { credentials: "include" })
       .then((res) => {
         if (!res.ok) throw new Error("無法取得作品資料");
         return res.json();
       })
-      .then(setPieces)
+      .then((data) => {
+        console.log("取得作品資料：", data);  
+        setPieces(data.pieces || []);
+      })
       .catch(() => setStatus("無法取得作品資料，請稍後再試"));
   }, [userInfo, isLoadingUser, navigate]);
 
@@ -42,12 +45,12 @@ function GradePage() {
       return;
     }
     setLoading(true);
-    fetch("http://localhost:5000/api/judge/score", {
+    fetch(`http://localhost:5000/api/judge/score?ssn=${encodeURIComponent(userInfo.ssn)}`, {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        pid: selectedPid,
+        pid: selectedPiece.pid,
         score: Number(score),
         comment,
       }),

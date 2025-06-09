@@ -2,6 +2,8 @@ import React, { useEffect, useReducer } from "react";
 import Navbar from "../components/Navbar.jsx";
 import { useUser } from "../contexts/UserContext";
 import { useNavigate } from "react-router-dom";
+import Skeleton from "react-loading-skeleton";
+import 'react-loading-skeleton/dist/skeleton.css';
 
 // 共用 API hooks
 function useTeamApi() {
@@ -275,8 +277,47 @@ export default function EditTeamInfoPage() {
     return (
       <>
         <Navbar />
-        <div className="bg-[#023047] text-white min-h-screen flex items-center justify-center">
-          {error ? error : "載入中..."}
+        <div className="bg-[#023047] text-white pt-32 min-h-screen w-screen m-0 flex items-center justify-center">
+          <div className="max-w-3xl w-full bg-white text-black rounded-2xl shadow-2xl border border-[#8ecae6] p-8">
+            {/* 標題 Skeleton */}
+            <Skeleton height={32} width={200} className="mb-8 mx-auto" baseColor="#d9e3ec" highlightColor="#f0f4f8" />
+            
+            {/* 隊伍名稱欄位 Skeleton */}
+            <div className="mb-6">
+              <Skeleton height={20} width={100} className="mb-1" baseColor="#d9e3ec" highlightColor="#f0f4f8" />
+              <Skeleton height={40} baseColor="#d9e3ec" highlightColor="#f0f4f8" />
+            </div>
+
+            {/* 指導老師欄位 Skeleton */}
+            <div className="mb-6">
+              <Skeleton height={20} width={150} className="mb-1" baseColor="#d9e3ec" highlightColor="#f0f4f8" />
+              <Skeleton height={40} baseColor="#d9e3ec" highlightColor="#f0f4f8" />
+              <Skeleton height={16} width={120} className="mt-1" baseColor="#d9e3ec" highlightColor="#f0f4f8" />
+            </div>
+
+            {/* 年度欄位 Skeleton */}
+            <div className="mb-6">
+              <Skeleton height={20} width={60} className="mb-1" baseColor="#d9e3ec" highlightColor="#f0f4f8" />
+              <Skeleton height={40} baseColor="#d9e3ec" highlightColor="#f0f4f8" />
+            </div>
+
+            {/* 隊員資訊欄位 Skeleton */}
+            <div className="mb-6">
+              <Skeleton height={20} width={300} className="mb-2" baseColor="#d9e3ec" highlightColor="#f0f4f8" />
+              <div className="space-y-4">
+                {Array(3).fill(0).map((_, idx) => (
+                  <div key={idx} className="flex items-center gap-2">
+                    <Skeleton width={160} height={32} baseColor="#d9e3ec" highlightColor="#f0f4f8" />
+                    <Skeleton width={100} height={16} baseColor="#d9e3ec" highlightColor="#f0f4f8" />
+                  </div>
+                ))}
+                <Skeleton width={120} height={36} className="mt-2" baseColor="#d9e3ec" highlightColor="#f0f4f8" />
+              </div>
+            </div>
+
+            {/* 送出按鈕 Skeleton */}
+            <Skeleton height={48} baseColor="#d9e3ec" highlightColor="#f0f4f8" />
+          </div>
         </div>
       </>
     );
