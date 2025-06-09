@@ -8,6 +8,24 @@ def _get_ssn():
     ssn = request.cookies.get("ssn") or request.args.get("ssn")
     return ssn
 
+def update_team_rank(sb):
+    """
+    呼叫 get_team_avg_scores() → 更新 team.rank
+    """
+    avg_resp = sb.rpc("get_team_avg_scores").execute()
+    avg_data = avg_resp.data or []
+
+    sorted_teams = sorted(avg_data, key=lambda x: -x["avg_score"])
+
+    for rank, team in enumerate(sorted_teams, start=1):
+        team_tid = team["tid"]
+        sb.from_("team") \
+          .update({"rank": str(rank)}) \
+          .eq("tid", team_tid) \
+          .execute()
+
+    print("Rank 更新成功 (update_team_rank)")
+
 @judge_bp.route('/submitted-scores', methods=['GET'])
 def get_submitted_scores():
     sb = current_app.supabase
@@ -103,13 +121,21 @@ def edit_submitted_score(id):
               .eq('id', id)
               .execute()
         )
+
+        # 判斷更新結果：data 為空 list => 沒更新到任何列
+        if not upd.data:
+            print(f"無法更新評分 id={id}，可能是因為沒有變更")
+            return jsonify({"success": False, "message": "無法更新，請稍後重試"}), 500
+
+        # 🌟 更新成功 → 重新計算 rank
+        try:
+            update_team_rank(sb)
+        except Exception as e:
+            print(f"更新 Rank 失敗：{e}")
+            # 不影響主流程，主流程仍然成功
+
+        return jsonify({"success": True, "message": "評分已更新！"}), 200
+
     except Exception as e:
         print(f"更新評分例外 (id={id})：{e}")
         return jsonify({"success": False, "message": "伺服器錯誤"}), 500
-
-    # 判斷更新結果：data 為空 list => 沒更新到任何列
-    if not upd.data:
-        print(f"無法更新評分 id={id}，可能是因為沒有變更")
-        return jsonify({"success": False, "message": "無法更新，請稍後重試"}), 500
-
-    return jsonify({"success": True, "message": "評分已更新！"}), 200
