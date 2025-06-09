@@ -34,7 +34,7 @@ function EditPiecePage() {
     const fetchPiece = async () => {
       setIsFetching(true);
       try {
-        const res = await fetch(`http://localhost:5000/api/piece/${tid}`, {
+        const res = await fetch(`http://localhost:5000/api/piece/get/${tid}`, {
           method: "GET",
           credentials: "include",
           headers: { "Content-Type": "application/json" },
