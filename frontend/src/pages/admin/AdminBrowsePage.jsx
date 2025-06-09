@@ -24,6 +24,7 @@ export default function AdminBrowsePage() {
     const [data, setData] = useState([]);
     const [columns, setColumns] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState("");
 
     useEffect(() => {
         if (isLoadingUser) return;
@@ -45,7 +46,6 @@ export default function AdminBrowsePage() {
                 });
 
                 const json = await res.json();
-                console.log(json);
                 if (Array.isArray(json) && json.length > 0) {
                     setData(json);
                     setColumns(Object.keys(json[0]));
@@ -63,6 +63,12 @@ export default function AdminBrowsePage() {
         fetchData();
     }, [identity]);
 
+    const filteredData = data.filter(row =>
+        Object.values(row).some(value =>
+            String(value).toLowerCase().includes(searchTerm.toLowerCase())
+        )
+    );
+
     return (
         <>
             <Navbar />
@@ -78,8 +84,7 @@ export default function AdminBrowsePage() {
                         <button
                             key={id}
                             onClick={() => setIdentity(id)}
-                            className={`px-5 py-2 rounded-xl font-semibold text-white transition-transform transform hover:scale-105 shadow ${identity === id ? "bg-blue-800" : "bg-blue-500 hover:bg-blue-700"
-                                }`}
+                            className={`px-5 py-2 rounded-xl font-semibold text-white transition-transform transform hover:scale-105 shadow ${identity === id ? "bg-blue-800" : "bg-blue-500 hover:bg-blue-700"}`}
                         >
                             {identityLabels[id]}
                         </button>
@@ -87,12 +92,20 @@ export default function AdminBrowsePage() {
                 </div>
 
                 <div className="mx-auto w-11/12 md:w-4/5 bg-white text-black rounded-xl shadow-lg p-6 overflow-x-auto">
+                    <input
+                        type="text"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        placeholder="搜尋關鍵字..."
+                        className="mb-4 w-full px-3 py-2 border border-gray-300 rounded"
+                    />
+
                     {isLoading ? (
                         <>
                             <Skeleton height={40} width={200} className="mb-3" baseColor="#d9e3ec" highlightColor="#f0f4f8" />
                             <Skeleton count={6} height={40} className="mb-3" baseColor="#d9e3ec" highlightColor="#f0f4f8" />
                         </>
-                    ) : data.length > 0 ? (
+                    ) : filteredData.length > 0 ? (
                         <div className="min-w-max">
                             <table className="table-auto w-full border-collapse">
                                 <thead>
@@ -108,7 +121,7 @@ export default function AdminBrowsePage() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {data.map((row, idx) => (
+                                    {filteredData.map((row, idx) => (
                                         <tr
                                             key={idx}
                                             className={idx % 2 === 0 ? "bg-gray-100" : "bg-white"}
