@@ -21,7 +21,7 @@ function EditGradePage() {
       navigate("/login");
       return;
     }
-    fetch("http://localhost:5000/api/judge/submitted-scores", { credentials: "include" })
+    fetch(`http://localhost:5000/api/judge/submitted-scores?ssn=${encodeURIComponent(userInfo.ssn)}`, { credentials: "include" })
       .then(res => {
         if (!res.ok) throw new Error("無法取得評分資料");
         return res.json();
@@ -46,7 +46,7 @@ function EditGradePage() {
       return;
     }
     setLoading(true);
-    fetch(`http://localhost:5000/api/judge/score/${editingScore.id}`, {
+    fetch(`http://localhost:5000/api/judge/score/${editingScore.id}?ssn=${encodeURIComponent(userInfo.ssn)}`, {
       method: "PUT",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
@@ -63,7 +63,7 @@ function EditGradePage() {
         setStatus("已更新！");
         setEditingScore(null);
         // 重新載入已送出評分
-        return fetch("http://localhost:5000/api/judge/submitted-scores", { credentials: "include" })
+        return fetch(`http://localhost:5000/api/judge/submitted-scores?ssn=${encodeURIComponent(userInfo.ssn)}`, { credentials: "include" })
           .then(res => res.json())
           .then(setSubmittedScores);
       })
