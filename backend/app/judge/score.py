@@ -8,7 +8,7 @@ def submit_score():
     sb = current_app.supabase
     data = request.get_json() or {}
 
-    # 1) 取評審 ssn（優先從 Cookie，其次 query string）
+    # 1) 取評審 ssn
     ssn = request.cookies.get("ssn") or request.args.get("ssn")
     if not ssn:
         print("缺少評審身分(ssn)")
@@ -45,7 +45,6 @@ def submit_score():
               .maybe_single()
               .execute()
         )
-        # maybe_single() 回傳 .data == None 代表查無
         if exists_resp and exists_resp.data is not None:
             print(f"評審 {ssn} 已評分過隊伍 {tid}")
             return jsonify({"success": False, "message": "已評過該隊伍"}), 400
@@ -61,12 +60,38 @@ def submit_score():
               })
               .execute()
         )
-        # insert_resp.data 如果是 list 而且長度>0 表示成功
         if not insert_resp or not insert_resp.data:
             raise RuntimeError("Insert failed")
+
+        # 🌟 6) 插入成功 → 重新計算 rank
+        try:
+            # 呼叫 function 取得 avg scores
+            avg_resp = (
+                sb.rpc("get_team_avg_scores")
+                  .execute()
+            )
+            avg_data = avg_resp.data or []
+
+            # 排序（最高分第一名）
+            sorted_teams = sorted(avg_data, key=lambda x: -x["avg_score"])
+
+            # 更新 rank
+            for rank, team in enumerate(sorted_teams, start=1):
+                team_tid = team["tid"]
+                sb.from_("team") \
+                  .update({"rank": str(rank)}) \
+                  .eq("tid", team_tid) \
+                  .execute()
+
+            print("Rank 更新成功")
+
+        except Exception as e:
+            print(f"更新 Rank 失敗：{e}")
+            # 不影響評分流程，主流程還是成功
 
         return jsonify({"success": True, "message": "評分成功"}), 200
 
     except Exception as e:
         print(f"評分失敗：{e}")
         return jsonify({"success": False, "message": "伺服器錯誤"}), 500
+
